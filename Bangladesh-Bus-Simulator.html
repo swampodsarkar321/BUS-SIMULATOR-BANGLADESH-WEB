@@ -723,6 +723,7 @@ function build(){
   mkDimlaSchoolGate(cx(-L*0.35)+18, -L*0.35);
   mkDimlaGirlsSchoolGate(cx(-L*0.5)+14, -L*0.5);
   mkDimlaPoliceStation(cx(-L*0.65)+16, -L*0.65);
+  mkBuriTeestaBarrage(cx(-L*0.25)+16, -L*0.25);
   // driveways connecting landmarks to road
   landmarks.forEach(lm=>{
     const off=lm.x-cx(lm.z);
@@ -1333,6 +1334,40 @@ function mkAftabFuelStation(x,z){
   landmarks.push({x:x,z:z});
   g.rotation.y=-rh(z);
   g.position.set(x,0,z); world.add(g);
+}
+
+function mkBuriTeestaBarrage(x,z){
+  const g=new THREE.Group();
+  const pillarMat=new THREE.MeshStandardMaterial({color:0xdddddd,roughness:.9});
+  const gateMat=new THREE.MeshStandardMaterial({color:0xc45c43,roughness:.6});
+  const bridgeBlue=new THREE.MeshStandardMaterial({color:0x4287f5,roughness:.8});
+  const numPillars=8, spacing=5, totalLength=(numPillars-1)*spacing;
+  for(let i=0;i<numPillars;i++){
+    const xPos=i*spacing;
+    const pillar=new THREE.Mesh(new THREE.BoxGeometry(1.2,5,4),pillarMat); pillar.position.set(xPos,2.5,0); pillar.castShadow=true; g.add(pillar);
+    if(i<numPillars-1){
+      const gate=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,spacing,32),gateMat); gate.rotation.z=Math.PI/2; gate.position.set(xPos+spacing/2,1.8,0); gate.castShadow=true; g.add(gate);
+    }
+  }
+  const deck=new THREE.Mesh(new THREE.BoxGeometry(totalLength+2,.5,4),bridgeBlue); deck.position.set(totalLength/2,5.25,0); deck.castShadow=true; g.add(deck);
+  // railings
+  for(let side=-1;side<=1;side+=2){
+    const railZ=side*1.8;
+    const topRail=new THREE.Mesh(new THREE.CylinderGeometry(.1,.1,totalLength+2,8),bridgeBlue); topRail.rotation.z=Math.PI/2; topRail.position.set(totalLength/2,6.5,railZ); g.add(topRail);
+    for(let i=0;i<=totalLength*2;i++){ const post=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,1,8),bridgeBlue); post.position.set(i*.5-.5,6,railZ); g.add(post); }
+  }
+  // entrance gate at start
+  const gateGroup=new THREE.Group();
+  const apL=new THREE.Mesh(new THREE.BoxGeometry(.5,3.5,.5),bridgeBlue); apL.position.set(0,7.25,1.8); gateGroup.add(apL);
+  const apR=new THREE.Mesh(new THREE.BoxGeometry(.5,3.5,.5),bridgeBlue); apR.position.set(0,7.25,-1.8); gateGroup.add(apR);
+  const signTex=ctex(1024,256,(c,w,h)=>{c.fillStyle="#0f4c81";c.fillRect(0,0,w,h);c.fillStyle="#fff";c.textAlign="center";c.textBaseline="middle";c.font="bold 90px sans-serif";c.fillText("বুড়ী তিস্তা ব্যারেজ",w/2,h/2)});
+  const signMat=new THREE.MeshStandardMaterial({map:signTex});
+  const sign=new THREE.Mesh(new THREE.PlaneGeometry(4.5,1.2),signMat); sign.rotation.y=-Math.PI/2; sign.position.set(-.26,8.5,0); gateGroup.add(sign);
+  const signBack=new THREE.Mesh(new THREE.PlaneGeometry(4.5,1.2),bridgeBlue); signBack.rotation.y=Math.PI/2; signBack.position.set(.26,8.5,0); gateGroup.add(signBack);
+  gateGroup.position.set(-.5,0,0); g.add(gateGroup);
+  g.position.set(x,0,z); g.rotation.y=-rh(z);
+  landmarks.push({x:x,z:z});
+  world.add(g);
 }
 
 /* ---------- Master Bus */
