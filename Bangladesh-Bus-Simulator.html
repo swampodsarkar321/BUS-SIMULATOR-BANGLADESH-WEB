@@ -97,9 +97,11 @@ label{display:flex;gap:10px;align-items:center;font-size:14px}
 .pb{display:block;height:5px;background:rgba(255,255,255,.2);border-radius:3px;margin-top:3px;overflow:hidden}.pb u{display:block;height:100%;width:0;background:var(--ac);text-decoration:none}
 #spd{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:min(200px,30vw);pointer-events:none}
 #a6{position:absolute;right:10px;top:8px;display:flex;gap:6px;pointer-events:none}
-.tb2{pointer-events:auto;width:40px;height:40px;padding:0;border-radius:50%;background:rgba(8,20,16,.6);font-size:16px;border:1px solid rgba(255,255,255,.3);color:#fff}
-.tk{pointer-events:auto;position:absolute;border-radius:50%;padding:0;background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.5);font-size:18px;color:#fff}
-.tk.dn,.tb2.dn{background:var(--ac);color:#000}.pd{border-radius:22px}.gs{background:rgba(46,204,113,.35);border-color:#2ecc71}.br{background:rgba(255,82,82,.35);border-color:#ff5252}
+.tb2{pointer-events:auto;width:46px;height:46px;padding:0;border-radius:50%;background:linear-gradient(135deg,rgba(10,143,90,.7),rgba(8,20,16,.8));font-size:18px;border:1.5px solid rgba(242,183,5,.5);color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.2);transition:all .12s;backdrop-filter:blur(4px)}
+.tb2:active,.tb2.dn{background:linear-gradient(135deg,#f2b705,#e6a800);color:#000;transform:scale(.92);box-shadow:0 2px 8px rgba(242,183,5,.6)}
+.tk{pointer-events:auto;position:absolute;border-radius:50%;padding:0;background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.06));border:2px solid rgba(255,255,255,.4);font-size:16px;font-weight:800;color:#fff;box-shadow:0 6px 16px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.25);transition:all .12s;backdrop-filter:blur(6px);text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.tk.dn{background:linear-gradient(135deg,#f2b705,#e6a800);color:#000;transform:scale(.93);box-shadow:0 3px 10px rgba(242,183,5,.7)}
+.pd{border-radius:20px}.gs{background:linear-gradient(135deg,rgba(46,204,113,.5),rgba(39,174,96,.3));border-color:#2ecc71}.br{background:linear-gradient(135deg,rgba(255,82,82,.5),rgba(231,76,60,.3));border-color:#ff5252}
 #tc2{position:absolute;inset:0;display:none;pointer-events:none}
 #rot{display:none;position:fixed;inset:0;z-index:20;background:#0b1a14;color:var(--ac);align-items:center;justify-content:center;font-size:22px;text-align:center;padding:24px}
 @media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
@@ -592,7 +594,7 @@ function inst(g,m,n,f,sh){
   im.castShadow=!!sh;im.receiveShadow=!!sh;im.frustumCulled=false;world.add(im);return im;
 }
 
-let gt,at,dt,wt,smoke=[],people=[],tex0=false;
+let gt,at,dt,wt,smoke=[],people=[],ROUTE_LEN=0,tex0=false;
 function texInit(){
   if(tex0)return;tex0=true;
   gt=rep(ctex(64,64,(g,w,h)=>{
@@ -615,6 +617,7 @@ function build(){
   if(world){scene.remove(world);world.traverse(o=>{if(o.geometry)o.geometry.dispose()})}
   world=new THREE.Group();scene.add(world);bumps=[];bridges=[];traffic=[];stopsZ=[];pad=null;
   const r=MAP_ROUTES[S.route]||MAP_ROUTES[0],L=r.len,E=-L-250,q=Q[S.q],n=Math.min(1200,Math.round(q.n*Math.max(1,L/9000)));
+  ROUTE_LEN=L;
   gt.repeat.set(88,(L+1500)/8);
 
   const gm=new THREE.Mesh(new THREE.PlaneGeometry(700,L+1500).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({map:gt,roughness:1}));
@@ -1484,7 +1487,7 @@ function render(dt,ts){
   people.forEach(p=>{
     p.position.z -= p.userData.speed*dt;
     p.position.x = cx(p.position.z) + p.userData.side*p.userData.offset;
-    if(p.position.z < -L+20 || p.position.z > 10){
+    if(p.position.z < -ROUTE_LEN+20 || p.position.z > 10){
       p.position.z = (Math.random()<.5?P.z-20:P.z-60);
       p.userData.side = Math.random()<.5?-1:1;
       p.userData.offset = rnd(10,18);
@@ -1728,14 +1731,14 @@ $("pm").onclick=toMenu;$("em").onclick=toMenu;
     k?bind(b,k):b.onclick=togglePause;$("a6").appendChild(b);
   });
   [
-    ["left","◀","left:14px;bottom:14px;width:84px;height:84px",""],
-    ["right","▶","left:108px;bottom:14px;width:84px;height:84px",""],
-    ["brake","BRAKE","right:104px;bottom:14px;width:84px;height:100px","pd br"],
-    ["gas","GAS","right:14px;bottom:14px;width:84px;height:130px","pd gs"],
-    ["horn","🔊","right:14px;bottom:152px;width:50px;height:50px",""],
-    ["hand","P","right:70px;bottom:152px;width:50px;height:50px",""],
-    ["gear","G▲","right:126px;bottom:152px;width:50px;height:50px",""],
-    ["gearD","G▼","right:182px;bottom:152px;width:50px;height:50px",""]
+    ["left","◀","left:18px;bottom:18px;width:90px;height:90px",""],
+    ["right","▶","left:118px;bottom:18px;width:90px;height:90px",""],
+    ["brake","BRAKE","right:110px;bottom:18px;width:90px;height:110px","pd br"],
+    ["gas","GAS","right:18px;bottom:18px;width:90px;height:140px","pd gs"],
+    ["horn","🔊","right:18px;bottom:168px;width:56px;height:56px",""],
+    ["hand","P","right:80px;bottom:168px;width:56px;height:56px",""],
+    ["gear","G▲","right:142px;bottom:168px;width:56px;height:56px",""],
+    ["gearD","G▼","right:204px;bottom:168px;width:56px;height:56px",""]
   ].forEach(([k,l,st,cl2])=>{
     const b=document.createElement("button");b.className="tk "+cl2;b.textContent=l;b.style.cssText=st;bind(b,k);$("tc2").appendChild(b);
   });
