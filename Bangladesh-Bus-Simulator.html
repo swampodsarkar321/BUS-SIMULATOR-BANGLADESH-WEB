@@ -1344,30 +1344,33 @@ function mkBuriTeestaBarrage(x,z){
   const numPillars=8, spacing=5, totalLength=(numPillars-1)*spacing;
   for(let i=0;i<numPillars;i++){
     const xPos=i*spacing;
-    const pillar=new THREE.Mesh(new THREE.BoxGeometry(1.2,5,4),pillarMat); pillar.position.set(xPos,2.5,0); pillar.castShadow=true; g.add(pillar);
+    const pillar=new THREE.Mesh(new THREE.BoxGeometry(1.2,5,4),pillarMat); pillar.position.set(xPos,-2.5,0); pillar.castShadow=true; g.add(pillar);
     if(i<numPillars-1){
-      const gate=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,spacing,32),gateMat); gate.rotation.z=Math.PI/2; gate.position.set(xPos+spacing/2,1.8,0); gate.castShadow=true; g.add(gate);
+      const gate=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,spacing,32),gateMat); gate.rotation.z=Math.PI/2; gate.position.set(xPos+spacing/2,-3.2,0); gate.castShadow=true; g.add(gate);
     }
   }
-  const deck=new THREE.Mesh(new THREE.BoxGeometry(totalLength+2,.5,4),bridgeBlue); deck.position.set(totalLength/2,5.25,0); deck.castShadow=true; g.add(deck);
+  const deck=new THREE.Mesh(new THREE.BoxGeometry(totalLength+2,.5,4),bridgeBlue); deck.position.set(totalLength/2,0,0); deck.castShadow=true; deck.receiveShadow=true; g.add(deck);
   // railings
   for(let side=-1;side<=1;side+=2){
     const railZ=side*1.8;
-    const topRail=new THREE.Mesh(new THREE.CylinderGeometry(.1,.1,totalLength+2,8),bridgeBlue); topRail.rotation.z=Math.PI/2; topRail.position.set(totalLength/2,6.5,railZ); g.add(topRail);
-    for(let i=0;i<=totalLength*2;i++){ const post=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,1,8),bridgeBlue); post.position.set(i*.5-.5,6,railZ); g.add(post); }
+    const topRail=new THREE.Mesh(new THREE.CylinderGeometry(.1,.1,totalLength+2,8),bridgeBlue); topRail.rotation.z=Math.PI/2; topRail.position.set(totalLength/2,1.25,railZ); g.add(topRail);
+    for(let i=0;i<=totalLength*2;i++){ const post=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,1,8),bridgeBlue); post.position.set(i*.5-.5,.75,railZ); g.add(post); }
   }
   // entrance gate at start
   const gateGroup=new THREE.Group();
-  const apL=new THREE.Mesh(new THREE.BoxGeometry(.5,3.5,.5),bridgeBlue); apL.position.set(0,7.25,1.8); gateGroup.add(apL);
-  const apR=new THREE.Mesh(new THREE.BoxGeometry(.5,3.5,.5),bridgeBlue); apR.position.set(0,7.25,-1.8); gateGroup.add(apR);
+  const apL=new THREE.Mesh(new THREE.BoxGeometry(.5,3.5,.5),bridgeBlue); apL.position.set(0,2.25,1.8); gateGroup.add(apL);
+  const apR=new THREE.Mesh(new THREE.BoxGeometry(.5,3.5,.5),bridgeBlue); apR.position.set(0,2.25,-1.8); gateGroup.add(apR);
   const signTex=ctex(1024,256,(c,w,h)=>{c.fillStyle="#0f4c81";c.fillRect(0,0,w,h);c.fillStyle="#fff";c.textAlign="center";c.textBaseline="middle";c.font="bold 90px sans-serif";c.fillText("বুড়ী তিস্তা ব্যারেজ",w/2,h/2)});
   const signMat=new THREE.MeshStandardMaterial({map:signTex});
-  const sign=new THREE.Mesh(new THREE.PlaneGeometry(4.5,1.2),signMat); sign.rotation.y=-Math.PI/2; sign.position.set(-.26,8.5,0); gateGroup.add(sign);
-  const signBack=new THREE.Mesh(new THREE.PlaneGeometry(4.5,1.2),bridgeBlue); signBack.rotation.y=Math.PI/2; signBack.position.set(.26,8.5,0); gateGroup.add(signBack);
+  const sign=new THREE.Mesh(new THREE.PlaneGeometry(4.5,1.2),signMat); sign.rotation.y=-Math.PI/2; sign.position.set(-.26,3.5,0); gateGroup.add(sign);
+  const signBack=new THREE.Mesh(new THREE.PlaneGeometry(4.5,1.2),bridgeBlue); signBack.rotation.y=Math.PI/2; signBack.position.set(.26,3.5,0); gateGroup.add(signBack);
   gateGroup.position.set(-.5,0,0); g.add(gateGroup);
-  g.position.set(x,0,z); g.rotation.y=-rh(z);
+  // water below
+  const water=new THREE.Mesh(new THREE.PlaneGeometry(totalLength+20,20).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:0x2f6f92,roughness:.05,metalness:.2}));
+  water.position.set(totalLength/2,-3,0); g.add(water);
   landmarks.push({x:x,z:z});
-  world.add(g);
+  g.rotation.y=-rh(z);
+  g.position.set(x,0,z); world.add(g);
 }
 
 /* ---------- Master Bus */
