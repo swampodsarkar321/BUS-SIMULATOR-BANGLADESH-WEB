@@ -687,11 +687,11 @@ function build(){
   const ds=new THREE.Mesh(new THREE.PlaneGeometry(6,1.5),new THREE.MeshBasicMaterial({map:dimlaSign}));
   ds.position.set(cx(-5)+8,3.5,-5); world.add(ds);
   mkDimlaMonument(cx(-5)+12, -5);
-  mkDimlaHospital(cx(-5)+20, -30);
-  mkDimlaCollegeGate(cx(-5)+30, -20);
-  mkDimlaSchoolGate(cx(-5)+40, -25);
-  mkDimlaPoliceStation(cx(-5)+50, -35);
-  mkDimlaGirlsSchoolGate(cx(-5)+15, -15);
+  mkDimlaHospital(cx(-L*0.1)+16, -L*0.1);
+  mkDimlaCollegeGate(cx(-L*0.2)+14, -L*0.2);
+  mkDimlaSchoolGate(cx(-L*0.35)+18, -L*0.35);
+  mkDimlaGirlsSchoolGate(cx(-L*0.5)+14, -L*0.5);
+  mkDimlaPoliceStation(cx(-L*0.65)+16, -L*0.65);
   // Ticket counter
   box(4,2.5,3,M(0xd9cbb0,.6), cx(-8)+10,1.25,-8);
   box(3.6,.1,2.6,M(0x888888,.4), cx(-8)+10,2.55,-8);
