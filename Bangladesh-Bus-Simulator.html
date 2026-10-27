@@ -105,8 +105,16 @@ label{display:flex;gap:10px;align-items:center;font-size:14px}
 #tc2{position:absolute;inset:0;display:none;pointer-events:none}
 #rot{display:none;position:fixed;inset:0;z-index:20;background:#0b1a14;color:var(--ac);align-items:center;justify-content:center;font-size:22px;text-align:center;padding:24px}
 @media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
-#splash{position:fixed;inset:0;z-index:99;background:linear-gradient(135deg,#0b1a14 0%,#16382b 50%,#0b1a14 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;color:var(--ac);font-size:clamp(28px,6vw,48px);font-weight:900;text-shadow:0 0 30px rgba(242,183,5,.6);transition:opacity .6s}#splash.hide{opacity:0;pointer-events:none}
-#ld{position:fixed;inset:0;z-index:9;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--ac);font-size:20px;padding:20px;text-align:center}
+#splash{position:fixed;inset:0;z-index:99;background:radial-gradient(circle at 50% 50%,#1a3a2a 0%,#0b1a14 70%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;color:var(--ac);font-size:clamp(28px,6vw,48px);font-weight:900;text-shadow:0 0 30px rgba(242,183,5,.6);transition:opacity .8s;overflow:hidden}
+#splash.hide{opacity:0;pointer-events:none}
+#splash .bus-icon{font-size:clamp(60px,12vw,100px);animation:bounce 1.2s ease-in-out infinite}
+#splash .title{animation:fadeInUp .8s ease-out}
+#splash .subtitle{font-size:clamp(14px,3vw,20px);color:#9ec8b2;font-weight:600;animation:fadeInUp 1s ease-out}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes fadeInUp{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+#ld{position:fixed;inset:0;z-index:98;background:linear-gradient(135deg,#0b1a14 0%,#16382b 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;color:var(--ac);font-size:20px;padding:20px;text-align:center}
+#ld .spinner{width:60px;height:60px;border:4px solid rgba(242,183,5,.2);border-top-color:var(--ac);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -297,8 +305,8 @@ label{display:flex;gap:10px;align-items:center;font-size:14px}
   <div class="row"><button class="pri" id="er" data-i="restart"></button><button id="em" data-i="menu"></button></div>
 </div>
 
-<div id="splash"><div>BUS SIMULATOR</div><div style="font-size:clamp(14px,3vw,20px);color:#9ec8b2;font-weight:600">WEB EDITION</div></div>
-<div id="ld">Loading 3D Engine & Textures…</div>
+<div id="splash"><div class="bus-icon">🚌</div><div class="title">BUS SIMULATOR</div><div class="subtitle">WEB EDITION — Bangladesh</div></div>
+<div id="ld"><div class="spinner"></div><div>Loading 3D Engine & Textures…</div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -1396,7 +1404,7 @@ function init(){
   addEventListener("resize",resize);
   buildUI();setupBangladeshMapUI();
   $("ld").style.display="none";
-  setTimeout(()=>{$("splash").classList.add("hide");setTimeout(()=>{$("splash").style.display="none"},700)},1200);
+  setTimeout(()=>{$("splash").classList.add("hide");setTimeout(()=>{$("splash").style.display="none"},800)},2000);
   requestAnimationFrame(loop);
 }
 
