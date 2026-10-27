@@ -1330,6 +1330,17 @@ function mkBus(){
     c.fillText(rCurr.n[1].split("–")[1]||rCurr.dest,w/2,42);
   })}));
   dm.position.set(0,3.27,-4.94);dm.rotation.set(.38,Math.PI,0);body.add(dm);
+  // company name branding on sides (Bangladeshi bus style)
+  const busName=B[S.bus].n.split("(")[0].trim();
+  const brandTex=ctex(512,128,(c,w,h)=>{
+    c.fillStyle="rgba(0,0,0,.6)"; c.fillRect(0,0,w,h);
+    c.fillStyle="#fff"; c.font="bold 48px 'Noto Sans Bengali',sans-serif"; c.textAlign="center"; c.textBaseline="middle";
+    c.fillText(busName,w/2,h/2);
+    c.strokeStyle="#f2b705"; c.lineWidth=4; c.strokeRect(4,4,w-8,h-8);
+  });
+  const brandMat=new THREE.MeshBasicMaterial({map:brandTex,transparent:true});
+  const brandL=new THREE.Mesh(new THREE.PlaneGeometry(4.5,1.1),brandMat); brandL.position.set(-1.55,2.6,0); brandL.rotation.y=-Math.PI/2; body.add(brandL);
+  const brandR=brandL.clone(); brandR.position.x=1.55; brandR.rotation.y=Math.PI/2; body.add(brandR);
 
   box(1.8,.35,3,M(0xeeeeee,.4),0,3.7,1.5,body);box(1.4,.08,1,M(0xcccccc,.4),0,3.6,-2,body);
   const sm=M(0x2b4a7a,.8),bs=new THREE.InstancedMesh(new THREE.BoxGeometry(.5,.4,.5),sm,40),br=new THREE.InstancedMesh(new THREE.BoxGeometry(.5,.9,.14),sm,40);
