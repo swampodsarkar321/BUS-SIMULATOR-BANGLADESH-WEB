@@ -145,6 +145,8 @@ label{display:flex;gap:10px;align-items:center;font-size:14px}
     </div>
     <div id="a6"></div>
     <canvas id="spd" width="160" height="120"></canvas>
+<div id="fuel-gauge" style="position:absolute;bottom:130px;left:50%;transform:translateX(-50%);width:160px;height:8px;background:#274;border-radius:4px;overflow:hidden;pointer-events:none"><div id="fuel-fill" style="height:100%;width:0;background:linear-gradient(90deg,#2ecc71,#f2b705);border-radius:4px;transition:width .2s"></div></div>
+<div id="dmg-gauge" style="position:absolute;bottom:120px;left:50%;transform:translateX(-50%);width:160px;height:6px;background:#422;border-radius:3px;overflow:hidden;pointer-events:none"><div id="dmg-fill" style="height:100%;width:0;background:linear-gradient(90deg,#ff9800,#ff5252);border-radius:3px;transition:width .2s"></div></div>
     <div id="tc2"></div>
     <!-- ETS2 GPS Route Advisor Widget -->
     <div id="route-advisor">
@@ -460,7 +462,7 @@ const rh=z=>Math.atan2(cx(z-5)-cx(z+5),10);
 
 /* ---------- Engine State ---------- */
 let renderer,scene,cam,sun,hemi,spot,ambient,fill,sunDisk,world,busG,body,wF=[],wR=[],swh,hlM,tlM,indM={},traffic=[],rain,rd=[],bumps=[],bridges=[],stopsZ=[],pad=null,roadMat,sunMat,wetS=0;
-const P={x:-3,z:0,h:0,v:0,steer:0,rpm:800,sy:0,sv:0,roll:0,pitch:0,fuel:100,thr:0,wr:0,eng:true,gear:1,tod:.12,acc:0,airPressure:100};
+const P={x:-3,z:0,h:0,v:0,steer:0,rpm:800,sy:0,sv:0,roll:0,pitch:0,fuel:100,damage:0,thr:0,wr:0,eng:true,gear:1,tod:.12,acc:0,airPressure:100};
 let G={state:"menu"},camM=0,lights=false,ind=0,blink=false,prev="menu",helperTimer=0;
 let menuOrbitAngle=0.8, isDraggingTurntable=false, lastPointerX=0;
 const K={};
@@ -1594,6 +1596,10 @@ function step(dt){
   P.acc=(K.hand||(dn&&P.v>6))?Math.min(1,av/10):0;
 
   const pv=P.v;P.v+=a*dt;
+  // damage reduces max speed
+  const dmgFactor=1-P.damage/200;
+  const maxSpd=(bus.spd||120)/3.6*dmgFactor;
+  if(Math.abs(P.v)>maxSpd) P.v=Math.sign(P.v)*maxSpd;
   if(pv*P.v<0&&!(dn&&on&&gr>0)&&!(up&&on&&gr>0))P.v=0;
 
   const mx=.62/(1+Math.abs(P.v)*.14)*S.sens,tg=((K.right?1:0)-(K.left?1:0))*mx;
@@ -1609,7 +1615,7 @@ function step(dt){
   for(const v of traffic){
     if(!v||!v.m)continue;
     const dx=P.x-v.m.position.x, dz=P.z-v.m.position.z;
-    if(Math.hypot(dx,dz)<3.2){ P.v*=0.6; msg("crash"); break; }
+    if(Math.hypot(dx,dz)<3.2){ P.v*=0.4; P.damage=Math.min(100,P.damage+8); msg("crash"); break; }
   }
 
   for(const b of bumps){
@@ -1830,6 +1836,8 @@ function hudUpdate(dt){
   $("a3").textContent=t("next")+": "+nxt;
   $("a4").textContent=m=="park"?"":nb((rem/1000).toFixed(2))+" km · "+t("eta")+" "+mm(eta)+(G.limit?" · ⏱ "+mm(Math.max(0,G.limit-G.t)):"");
   $("a5").style.width=clamp(-P.z/G.len*100,0,100)+"%";
+  if($("fuel-fill"))$("fuel-fill").style.width=clamp(P.fuel,0,100)+"%";
+  if($("dmg-fill"))$("dmg-fill").style.width=clamp(P.damage,0,100)+"%";
   speedo(sp);
   updateRouteAdvisor(rem,sp);
 }
@@ -1850,13 +1858,14 @@ const tog={
   gearD:()=>{P.gear=Math.max(0,P.gear-1);playAirBrakePshhh();blip()},
   eng:()=>{if(P.fuel>0)P.eng=!P.eng},
   indL:()=>ind=ind==-1?0:-1,
-  indR:()=>ind=ind==1?0:1
+  indR:()=>ind=ind==1?0:1,
+  refuel:()=>{ if(Math.abs(P.z+ROUTE_LEN*0.35)<40){ P.fuel=100; msg("fuel refilled") } else { msg("no fuel station nearby") } }
 };
 const km={
   KeyW:"gas",ArrowUp:"gas",KeyS:"brake",ArrowDown:"brake",
   KeyA:"left",ArrowLeft:"left",KeyD:"right",ArrowRight:"right",
   Space:"hand",KeyH:"horn",KeyC:"cam",KeyL:"light",
-  KeyQ:"indL",KeyE:"indR",KeyG:"gear",KeyF:"gearD",KeyI:"eng"
+  KeyQ:"indL",KeyE:"indR",KeyG:"gear",KeyF:"gearD",KeyI:"eng",KeyR:"refuel"
 };
 
 function press(k){
