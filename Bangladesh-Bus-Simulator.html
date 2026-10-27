@@ -1653,9 +1653,13 @@ function render(dt,ts){
   }else if(camM==0){
     cam.fov=62;cam.position.lerp(new THREE.Vector3(P.x-fx*17,6.5,P.z-fz*17),k);
     cam.lookAt(P.x+fx*8,2.5,P.z+fz*8);
-  }else{
+  }else if(camM==1){
     cam.fov=75;cam.position.set(P.x+fx*4.3+rx*.7,2.75+P.sy,P.z+fz*4.3+rz*.7);
     cam.lookAt(P.x+fx*30+rx*.7,2.4,P.z+fz*30+rz*.7);
+  }else{
+    // cockpit / driver seat view
+    cam.fov=70;cam.position.set(P.x-rx*.8+fx*.5,2.05+P.sy,P.z-rz*.8+fz*.5);
+    cam.lookAt(P.x+fx*25,1.7,P.z+fz*25);
   }
   cam.updateProjectionMatrix();
 
@@ -1796,7 +1800,7 @@ function loop(ts){
 
 /* ---------- User Input & UI Setup ---------- */
 const tog={
-  cam:()=>camM^=1,
+  cam:()=>camM=(camM+1)%3,
   light:()=>lights=!lights,
   gear:()=>{P.gear=Math.min(5,P.gear+1);playAirBrakePshhh();blip()},
   gearD:()=>{P.gear=Math.max(0,P.gear-1);playAirBrakePshhh();blip()},
