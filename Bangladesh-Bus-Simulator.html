@@ -723,7 +723,7 @@ function build(){
   mkDimlaSchoolGate(cx(-L*0.35)+18, -L*0.35);
   mkDimlaGirlsSchoolGate(cx(-L*0.5)+14, -L*0.5);
   mkDimlaPoliceStation(cx(-L*0.65)+16, -L*0.65);
-  mkBuriTeestaBarrage(cx(-L*0.25)+16, -L*0.25);
+  mkBuriTeestaBarrage(cx(-L*0.25), -L*0.25);
   // driveways connecting landmarks to road
   landmarks.forEach(lm=>{
     const off=lm.x-cx(lm.z);
@@ -1349,7 +1349,7 @@ function mkBuriTeestaBarrage(x,z){
       const gate=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,spacing,32),gateMat); gate.rotation.z=Math.PI/2; gate.position.set(xPos+spacing/2,-3.2,0); gate.castShadow=true; g.add(gate);
     }
   }
-  const deck=new THREE.Mesh(new THREE.BoxGeometry(totalLength+2,.5,4),bridgeBlue); deck.position.set(totalLength/2,0,0); deck.castShadow=true; deck.receiveShadow=true; g.add(deck);
+  const deck=new THREE.Mesh(new THREE.BoxGeometry(totalLength+2,1,12),bridgeBlue); deck.position.set(totalLength/2,-0.5,0); deck.castShadow=true; deck.receiveShadow=true; g.add(deck);
   // railings
   for(let side=-1;side<=1;side+=2){
     const railZ=side*1.8;
