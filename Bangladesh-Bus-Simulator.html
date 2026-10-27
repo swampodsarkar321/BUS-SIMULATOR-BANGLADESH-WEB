@@ -686,6 +686,7 @@ function build(){
   const dimlaSign=ctex(320,80,(c,w,h)=>{c.fillStyle="#0d3b2a";c.fillRect(0,0,w,h);c.strokeStyle="#f2b705";c.lineWidth=4;c.strokeRect(2,2,w-4,h-4);c.fillStyle="#f2b705";c.font="bold 34px 'Noto Sans Bengali',sans-serif";c.textAlign="center";c.fillText("ডিমলা বাস স্ট্যান্ড",w/2,h/2+12)});
   const ds=new THREE.Mesh(new THREE.PlaneGeometry(6,1.5),new THREE.MeshBasicMaterial({map:dimlaSign}));
   ds.position.set(cx(-5)+8,3.5,-5); world.add(ds);
+  mkDimlaMonument(cx(-5)+12, -5);
   // Ticket counter
   box(4,2.5,3,M(0xd9cbb0,.6), cx(-8)+10,1.25,-8);
   box(3.6,.1,2.6,M(0x888888,.4), cx(-8)+10,2.55,-8);
@@ -1072,6 +1073,18 @@ function mkVeh(){
     ad(prof([[0,.5],[2.5,.5],[2.5,1.3],[1.9,1.4],[1.4,2.1],[0,2.1]],1.8,pt,.08));bx(1.5,.6,.05,GL,0,1.75,-1.7);bx(1.8,.1,2.5,pt,0,.7,1.25);[-.9,.9].forEach(s=>bx(.08,.5,2.5,pt,s,1,1.25));bx(1.8,.5,.08,pt,0,1,2.5);ls(.65,.8,2.52);ws(.9,.38,-1.6,.38);ws(.9,.38,1.7,.38);
   }
   return{m:g,w:dm[0],l:dm[1],k,ed:k==3||k==4,dir:-1,off:-3,spd:8,cs:8,z:0,hit:0};
+}
+
+function mkDimlaMonument(x,z){
+  const g=new THREE.Group();
+  const concrete=new THREE.MeshStandardMaterial({color:0xe0e0e0,roughness:.9,metalness:.05});
+  const banner=new THREE.MeshStandardMaterial({color:0x1a1a1a,roughness:.7,side:THREE.DoubleSide});
+  const b1=new THREE.Mesh(new THREE.BoxGeometry(4.5,1,4.5),concrete); b1.position.y=.5; b1.castShadow=true; b1.receiveShadow=true; g.add(b1);
+  const b2=new THREE.Mesh(new THREE.BoxGeometry(3.5,1,3.5),concrete); b2.position.y=1.5; b2.castShadow=true; b2.receiveShadow=true; g.add(b2);
+  const pillar=new THREE.Mesh(new THREE.CylinderGeometry(.8,1.4,9,32),concrete); pillar.position.y=6.5; pillar.castShadow=true; pillar.receiveShadow=true; g.add(pillar);
+  const disk=new THREE.Mesh(new THREE.CylinderGeometry(1.2,1.2,.4,32),concrete); disk.rotation.x=Math.PI/2; disk.position.y=11.2; disk.castShadow=true; g.add(disk);
+  const bn=new THREE.Mesh(new THREE.PlaneGeometry(1.5,6),banner); bn.position.set(0,6.5,1.35); bn.rotation.x=-.05; g.add(bn);
+  g.position.set(x,0,z); world.add(g);
 }
 
 /* ---------- Master Bus (With Non-Shuttering Livery) ---------- */
