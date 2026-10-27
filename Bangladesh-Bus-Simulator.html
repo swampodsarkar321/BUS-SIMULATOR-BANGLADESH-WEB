@@ -1330,7 +1330,11 @@ function mkBus(){
 
   box(2.3,.5,.6,M(0x222222),0,1.95,-5.0,body);
   swh=new THREE.Group();swh.position.set(.7,2.25,-4.5);swh.rotation.x=-1;body.add(swh);
-  const tr=new THREE.Mesh(new THREE.TorusGeometry(.22,.035,6,14),M(0x111111));tr.add(new THREE.Mesh(new THREE.BoxGeometry(.4,.03,.03),TY));
+  const tr=new THREE.Mesh(new THREE.TorusGeometry(.28,.04,8,16),M(0x111111));
+  tr.add(new THREE.Mesh(new THREE.BoxGeometry(.5,.04,.04),TY));
+  // steering column
+  const steerCol=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.6,8),M(0x888888,.4,.6));
+  steerCol.position.set(0,-.3,.15); steerCol.rotation.x=Math.PI/2; swh.add(steerCol);
   swh.add(tr);swh.userData.t=tr;
 
   spot=new THREE.SpotLight(0xfff2cc,0,80,.55,.5);spot.position.set(0,1.4,-5.4);spot.target.position.set(0,0,-40);g.add(spot,spot.target);
