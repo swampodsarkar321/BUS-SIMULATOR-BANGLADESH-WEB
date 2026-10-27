@@ -690,6 +690,7 @@ function build(){
   mkDimlaHospital(cx(-5)+20, -30);
   mkDimlaCollegeGate(cx(-5)+30, -20);
   mkDimlaSchoolGate(cx(-5)+40, -25);
+  mkDimlaGirlsSchoolGate(cx(-5)+15, -15);
   // Ticket counter
   box(4,2.5,3,M(0xd9cbb0,.6), cx(-8)+10,1.25,-8);
   box(3.6,.1,2.6,M(0x888888,.4), cx(-8)+10,2.55,-8);
@@ -1172,6 +1173,34 @@ function mkDimlaSchoolGate(x,z){
   const decoGeo=new THREE.BoxGeometry(1,1.5,1);
   const ld=new THREE.Mesh(decoGeo,red); ld.position.set(-9,12.5,0); g.add(ld);
   const rd=new THREE.Mesh(decoGeo,red); rd.position.set(9,12.5,0); g.add(rd);
+  g.position.set(x,0,z); world.add(g);
+}
+
+function mkDimlaGirlsSchoolGate(x,z){
+  const g=new THREE.Group();
+  const lightBlue=new THREE.MeshStandardMaterial({color:0x7da2cc,roughness:.8});
+  const wallGrey=new THREE.MeshStandardMaterial({color:0xcccccc,roughness:.9});
+  const wallRed=new THREE.MeshStandardMaterial({color:0xb53c3c,roughness:.8});
+  const metal=new THREE.MeshStandardMaterial({color:0xa0a0a0,metalness:.7,roughness:.4});
+  // pillars
+  const pGeo=new THREE.BoxGeometry(2,9,2);
+  const lp=new THREE.Mesh(pGeo,lightBlue); lp.position.set(-5,4.5,0); lp.castShadow=true; g.add(lp);
+  const rp=new THREE.Mesh(pGeo,lightBlue); rp.position.set(5,4.5,0); rp.castShadow=true; g.add(rp);
+  // top beam
+  const topBeam=new THREE.Mesh(new THREE.BoxGeometry(16,.8,3),lightBlue); topBeam.position.set(0,9.4,0); topBeam.castShadow=true; g.add(topBeam);
+  // text beam
+  const signTex=ctex(2048,256,(c,w,h)=>{c.fillStyle="#7da2cc";c.fillRect(0,0,w,h);c.fillStyle="#111";c.font="bold 75px sans-serif";c.textAlign="center";c.textBaseline="middle";c.fillText("ডিমলা সরকারি বালিকা উচ্চ বিদ্যালয়",w/2,h/2)});
+  const textBeamMat=new THREE.MeshStandardMaterial({map:signTex,roughness:.8});
+  const textBeam=new THREE.Mesh(new THREE.BoxGeometry(12,1.8,1.8),textBeamMat); textBeam.position.set(0,7.5,.11); textBeam.castShadow=true; g.add(textBeam);
+  // steel gate
+  const steelGate=new THREE.Mesh(new THREE.BoxGeometry(9.8,6,.3),metal); steelGate.position.set(0,3,0); steelGate.castShadow=true; g.add(steelGate);
+  // boundary walls
+  const wallGeo=new THREE.BoxGeometry(10,4.5,1);
+  const trimGeo=new THREE.BoxGeometry(10,.5,1.2);
+  const leftWall=new THREE.Mesh(wallGeo,wallGrey); leftWall.position.set(-11,2.25,1); leftWall.rotation.y=-Math.PI/12; leftWall.castShadow=true; g.add(leftWall);
+  const leftTrim=new THREE.Mesh(trimGeo,wallRed); leftTrim.position.set(-11,4.75,1); leftTrim.rotation.y=-Math.PI/12; g.add(leftTrim);
+  const rightWall=new THREE.Mesh(wallGeo,wallGrey); rightWall.position.set(11,2.25,0); rightWall.castShadow=true; g.add(rightWall);
+  const rightTrim=new THREE.Mesh(trimGeo,wallRed); rightTrim.position.set(11,4.75,0); g.add(rightTrim);
   g.position.set(x,0,z); world.add(g);
 }
 
