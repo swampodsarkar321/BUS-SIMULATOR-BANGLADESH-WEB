@@ -276,6 +276,7 @@ label{display:flex;gap:10px;align-items:center;font-size:14px}
   <label><span data-i="sens"></span><input type="range" id="ss" min=".5" max="1.5" step=".1"></label>
   <div class="row"><span data-i="gfx"></span><span class="row" id="sq"></span></div>
   <div class="row"><span data-i="sunDist"></span><span class="row" id="ssd"></span></div>
+  <div class="row"><span data-i="trafficDensity"></span><span class="row" id="td"></span></div>
   <div class="row"><button id="sl"></button><button id="sr"></button><button id="sm"></button></div>
   <button class="pri" id="sb" data-i="back"></button>
 </div>
@@ -319,13 +320,13 @@ window.addEventListener("error",e=>{const d=document.createElement("div");d.styl
 onerror=m=>{$("ld").style.display="flex";$("ld").textContent="Error: "+m};
 
 const TOUCH="ontouchstart" in window||navigator.maxTouchPoints>0;
-const S={lang:"bn",vol:.75,sens:1,q:"high",rain:false,mute:false,bus:0,mode:"career",route:0,money:1500,level:1,sunDist:1};
+const S={lang:"bn",vol:.75,sens:1,q:"high",rain:false,mute:false,bus:0,mode:"career",route:0,money:1500,level:1,sunDist:1,trafficDensity:1};
 try{Object.assign(S,JSON.parse(localStorage.bbs_pro_save||"{}"))}catch(e){}
 const save=()=>{try{localStorage.bbs_pro_save=JSON.stringify(S)}catch(e){}};
 
 const T={
-  en:{title:"Bangladesh Bus Simulator",free:"Free Drive",career:"Career",park:"Parking",hwy:"Highway",time:"Time Challenge",start:"Start driving",set:"Settings",resume:"Resume",restart:"Restart",menu:"Main menu",back:"Back",paused:"Paused",vol:"Volume",sens:"Steering",gfx:"Graphics",low:"Low",med:"Medium",high:"High",sunDist:"Sun Distance",done:"Journey complete",fail:"Journey failed",earn:"Earnings",col:"Collisions",tt:"Time",next:"Next",left:"left",eta:"ETA",pax:"Passengers",board:"Boarding passengers…",crash:"Collision!",spd:"Speeding fine!",fuel:"Out of fuel",miss:"Missed stop",late:"Time is up",pk:"Park inside the box",pkd:"Parked!",wallet:"Wallet",bal:"Balance",rain:"Rain",lang:"বাংলা",mute:"Mute",stop:"Stop at the green zone",hint:"W/S drive · A/D steer · G gear · Space handbrake · H horn · C camera",hintT:"Hold GAS to drive · ◀ ▶ steer · G▲/G▼ gear · P handbrake · 🔊 horn"},
-  bn:{title:"বাংলাদেশ বাস সিমুলেটর ৩ডি",free:"মুক্ত ড্রাইভ",career:"ক্যারিয়ার",park:"পার্কিং",hwy:"হাইওয়ে",time:"সময় চ্যালেঞ্জ",start:"ড্রাইভ শুরু",set:"সেটিংস",resume:"চালিয়ে যান",restart:"আবার শুরু",menu:"মূল মেনু",back:"ফিরে যান",paused:"বিরতি",vol:"ভলিউম",sens:"স্টিয়ারিং",gfx:"গ্রাফিক্স",low:"কম",med:"মাঝারি",high:"উচ্চ",sunDist:"সূর্যের দূরত্ব",done:"যাত্রা সম্পন্ন",fail:"যাত্রা ব্যর্থ",earn:"উপার্জন",col:"সংঘর্ষ",tt:"সময়",next:"পরবর্তী",left:"বাকি",eta:"পৌঁছাবে",pax:"যাত্রী",board:"যাত্রী উঠছে…",crash:"সংঘর্ষ!",spd:"গতিসীমা জরিমানা!",fuel:"জ্বালানি শেষ",miss:"স্টপ মিস",late:"সময় শেষ",pk:"বাক্সের ভেতরে পার্ক করুন",pkd:"পার্ক সম্পন্ন!",wallet:"ওয়ালেট",bal:"ব্যালেন্স",rain:"বৃষ্টি",lang:"English",mute:"মিউট",stop:"সবুজ জোনে থামুন",hint:"W/S চালান · A/D ঘোরান · G গিয়ার · Space হ্যান্ডব্রেক · H হর্ন · C ক্যামেরা",hintT:"GAS চেপে চালান · ◀ ▶ ঘোরান · G▲/G▼ গিয়ার · P হ্যান্ডব্রেক · 🔊 হর্ন"}
+  en:{title:"Bangladesh Bus Simulator",free:"Free Drive",career:"Career",park:"Parking",hwy:"Highway",time:"Time Challenge",start:"Start driving",set:"Settings",resume:"Resume",restart:"Restart",menu:"Main menu",back:"Back",paused:"Paused",vol:"Volume",sens:"Steering",gfx:"Graphics",low:"Low",med:"Medium",high:"High",sunDist:"Sun Distance",trafficDensity:"Traffic Density",done:"Journey complete",fail:"Journey failed",earn:"Earnings",col:"Collisions",tt:"Time",next:"Next",left:"left",eta:"ETA",pax:"Passengers",board:"Boarding passengers…",crash:"Collision!",spd:"Speeding fine!",fuel:"Out of fuel",miss:"Missed stop",late:"Time is up",pk:"Park inside the box",pkd:"Parked!",wallet:"Wallet",bal:"Balance",rain:"Rain",lang:"বাংলা",mute:"Mute",stop:"Stop at the green zone",hint:"W/S drive · A/D steer · G gear · Space handbrake · H horn · C camera",hintT:"Hold GAS to drive · ◀ ▶ steer · G▲/G▼ gear · P handbrake · 🔊 horn"},
+  bn:{title:"বাংলাদেশ বাস সিমুলেটর ৩ডি",free:"মুক্ত ড্রাইভ",career:"ক্যারিয়ার",park:"পার্কিং",hwy:"হাইওয়ে",time:"সময় চ্যালেঞ্জ",start:"ড্রাইভ শুরু",set:"সেটিংস",resume:"চালিয়ে যান",restart:"আবার শুরু",menu:"মূল মেনু",back:"ফিরে যান",paused:"বিরতি",vol:"ভলিউম",sens:"স্টিয়ারিং",gfx:"গ্রাফিক্স",low:"কম",med:"মাঝারি",high:"উচ্চ",sunDist:"সূর্যের দূরত্ব",trafficDensity:"ট্রাফিক ডেনসিটি",done:"যাত্রা সম্পন্ন",fail:"যাত্রা ব্যর্থ",earn:"উপার্জন",col:"সংঘর্ষ",tt:"সময়",next:"পরবর্তী",left:"বাকি",eta:"পৌঁছাবে",pax:"যাত্রী",board:"যাত্রী উঠছে…",crash:"সংঘর্ষ!",spd:"গতিসীমা জরিমানা!",fuel:"জ্বালানি শেষ",miss:"স্টপ মিস",late:"সময় শেষ",pk:"বাক্সের ভেতরে পার্ক করুন",pkd:"পার্ক সম্পন্ন!",wallet:"ওয়ালেট",bal:"ব্যালেন্স",rain:"বৃষ্টি",lang:"English",mute:"মিউট",stop:"সবুজ জোনে থামুন",hint:"W/S চালান · A/D ঘোরান · G গিয়ার · Space হ্যান্ডব্রেক · H হর্ন · C ক্যামেরা",hintT:"GAS চেপে চালান · ◀ ▶ ঘোরান · G▲/G▼ গিয়ার · P হ্যান্ডব্রেক · 🔊 হর্ন"}
 };
 const t=k=>T[S.lang][k]||k,li=()=>S.lang=="bn"?1:0,BD="০১২৩৪৫৬৭৮৯",nb=s=>S.lang=="bn"?String(s).replace(/\d/g,d=>BD[d]):String(s);
 
@@ -982,7 +983,7 @@ function build(){
   }
 
   /* traffic */
-  const tn=S.mode=="hwy"?q.tr+10:q.tr;
+  const tn=Math.round((S.mode=="hwy"?q.tr+10:q.tr)*[.3,1,2][S.trafficDensity||1]);
   for(let i=0;i<tn;i++){
     const v=mkVeh();v.m.position.y=0;world.add(v.m);traffic.push(v);respawn(v,-rnd(60,600));
   }
@@ -1873,6 +1874,7 @@ function buildUI(){
   group("gb",B.map((b,i)=>[i,b.n.split("(")[0]]),S.bus,v=>{S.bus=v;save();mkBus();buildUI()});
   group("sq",["low","med","high"].map(k=>[k,t(k)]),S.q,v=>S.q=v);
   group("ssd",[0,1,2].map(k=>[k,["Low","Med","High"][k]]),S.sunDist,v=>{S.sunDist=v;save();applyQ()});
+  group("td",[0,1,2].map(k=>[k,["Low","Med","High"][k]]),S.trafficDensity,v=>{S.trafficDensity=v;save()});
   updateHubUI();
   $("sl").textContent=t("lang");$("sr").textContent=t("rain")+(S.rain?" ✓":"");
   $("sm").textContent=t("mute")+(S.mute?" ✓":"");$("sv").value=S.vol;$("ss").value=S.sens;
