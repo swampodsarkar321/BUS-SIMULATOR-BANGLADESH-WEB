@@ -688,6 +688,7 @@ function build(){
   ds.position.set(cx(-5)+8,3.5,-5); world.add(ds);
   mkDimlaMonument(cx(-5)+12, -5);
   mkDimlaHospital(cx(-5)+20, -30);
+  mkDimlaCollegeGate(cx(-5)+30, -20);
   // Ticket counter
   box(4,2.5,3,M(0xd9cbb0,.6), cx(-8)+10,1.25,-8);
   box(3.6,.1,2.6,M(0x888888,.4), cx(-8)+10,2.55,-8);
@@ -1111,6 +1112,33 @@ function mkDimlaHospital(x,z){
   for(let i=-3;i<=3;i+=2){ if(i===0)continue; const w=new THREE.Mesh(wGeo,brown); w.position.set(i*2.5,10,.1); g.add(w); }
   // ground floor grill
   const grill=new THREE.Mesh(new THREE.PlaneGeometry(16,5),dark); grill.position.set(0,3,.01); g.add(grill);
+  g.position.set(x,0,z); world.add(g);
+}
+
+function mkDimlaCollegeGate(x,z){
+  const g=new THREE.Group();
+  const concrete=new THREE.MeshStandardMaterial({color:0xe3dec6,roughness:.9});
+  const wall=new THREE.MeshStandardMaterial({color:0xa0a0a0,roughness:1});
+  const blueGate=new THREE.MeshStandardMaterial({color:0x2980b9,roughness:.6,metalness:.3});
+  const pGeo=new THREE.BoxGeometry(1.8,8,1.8);
+  const lp=new THREE.Mesh(pGeo,concrete); lp.position.set(-6,4,0); lp.castShadow=true; lp.receiveShadow=true; g.add(lp);
+  const rp=new THREE.Mesh(pGeo,concrete); rp.position.set(6,4,0); rp.castShadow=true; rp.receiveShadow=true; g.add(rp);
+  const beam=new THREE.Mesh(new THREE.BoxGeometry(14,2.5,1.8),concrete); beam.position.set(0,9.25,0); beam.castShadow=true; beam.receiveShadow=true; g.add(beam);
+  const signTex=ctex(2048,512,(c,w,h)=>{
+    c.fillStyle="#e3dec6"; c.fillRect(0,0,w,h);
+    c.fillStyle="#111"; c.font="bold 110px sans-serif"; c.textAlign="center"; c.textBaseline="middle";
+    c.fillText("ডিমলা ইসলামিয়া ডিগ্রী মহাবিদ্যালয়",w/2,h/2-50);
+    c.font="55px sans-serif";
+    c.fillText("ডিমলা, নীলফামারী                            স্থাপিত- ১৯৮৩ইং",w/2,h/2+80);
+  });
+  const signMat=new THREE.MeshStandardMaterial({map:signTex,roughness:.8});
+  const sign=new THREE.Mesh(new THREE.PlaneGeometry(13.8,2.4),signMat); sign.position.set(0,9.25,.91); g.add(sign);
+  const wGeo=new THREE.BoxGeometry(7,5,1);
+  const lw=new THREE.Mesh(wGeo,wall); lw.position.set(-10.4,2.5,0); lw.castShadow=true; lw.receiveShadow=true; g.add(lw);
+  const rw=new THREE.Mesh(wGeo,wall); rw.position.set(10.4,2.5,0); rw.castShadow=true; rw.receiveShadow=true; g.add(rw);
+  const gGeo=new THREE.BoxGeometry(4.5,6,.1);
+  const lg=new THREE.Mesh(gGeo,blueGate); lg.position.set(-5.1,3.5,-2.2); lg.rotation.y=Math.PI/4; lg.castShadow=true; g.add(lg);
+  const rg=new THREE.Mesh(gGeo,blueGate); rg.position.set(5.1,3.5,-2.2); rg.rotation.y=-Math.PI/4; rg.castShadow=true; g.add(rg);
   g.position.set(x,0,z); world.add(g);
 }
 
