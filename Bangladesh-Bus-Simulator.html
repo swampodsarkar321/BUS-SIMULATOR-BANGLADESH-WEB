@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bangladesh Bus Simulator 3D - Pro Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1a14;--fg:#f3f7f1;--ac:#f2b705;--gr:#0a8f5a;--pn:rgba(8,20,16,.85);box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:"Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;touch-action:none}
+#c{position:fixed;inset:0;width:100%;height:100%}
+
+/* UI Screens */
+.scr{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(6,16,12,.92);backdrop-filter:blur(6px);padding:max(10px,env(safe-area-inset-top)) 14px max(10px,env(safe-area-inset-bottom));overflow:auto;text-align:center;z-index:10}
+.scr.on{display:flex}
+h1{margin:0;color:var(--ac);font-size:clamp(22px,4.5vw,36px);font-weight:900;text-shadow:0 2px 12px rgba(242,183,5,.4)}
+p.sub{margin:0 0 10px 0;color:#9ec8b2;font-size:14px}
+button{font:inherit;font-weight:700;color:var(--fg);background:#16382b;border:1px solid #2c6b50;border-radius:12px;padding:9px 16px;cursor:pointer;transition:all .15s}
+button:active{transform:scale(.96)}
+button.sel,button.pri{background:var(--gr);border-color:var(--ac);color:#fff;box-shadow:0 0 14px rgba(10,143,90,.5)}
+.row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
+label{display:flex;gap:10px;align-items:center;font-size:14px}
+
+/* AAA Simulator Hub Main Menu */
+#menu{background:linear-gradient(to right,rgba(6,16,12,.88) 0%,rgba(6,16,12,.2) 45%,rgba(6,16,12,.2) 55%,rgba(6,16,12,.88) 100%),linear-gradient(to bottom,rgba(6,16,12,.9) 0%,transparent 20%,transparent 80%,rgba(6,16,12,.92) 100%);backdrop-filter:none;pointer-events:none;display:none;flex-direction:column;justify-content:space-between;padding:env(safe-area-inset-top) 24px env(safe-area-inset-bottom);z-index:8}
+#menu.on{display:flex}
+#menu *{pointer-events:auto}
+
+.hub-header{display:flex;justify-content:space-between;align-items:center;width:100%;padding:14px 16px}
+.driver-card{display:flex;align-items:center;gap:12px;background:rgba(8,22,16,.85);border:1px solid rgba(242,183,5,.35);padding:8px 16px;border-radius:24px;box-shadow:0 4px 16px rgba(0,0,0,.4);backdrop-filter:blur(8px)}
+.driver-avatar{width:40px;height:40px;border-radius:50%;background:#16382b;border:2px solid var(--ac);display:flex;align-items:center;justify-content:center;font-size:20px}
+.driver-meta{text-align:left;line-height:1.3}
+.driver-meta b{color:#fff;font-size:14px}
+.driver-meta span{color:var(--ac);font-size:12px;display:block}
+
+.hub-center-title{text-align:center}
+.hub-center-title h1{font-size:clamp(22px,4vw,34px);margin:0;color:var(--ac);text-shadow:0 0 20px rgba(242,183,5,.4);letter-spacing:1px}
+.hub-center-title span{font-size:12px;color:#9ec8b2;letter-spacing:2px;text-transform:uppercase;font-weight:700}
+
+.hub-economy{display:flex;gap:10px;align-items:center}
+.econ-badge{background:rgba(8,22,16,.85);border:1px solid rgba(242,183,5,.35);padding:8px 16px;border-radius:24px;font-size:14px;font-weight:700;color:var(--ac);box-shadow:0 4px 16px rgba(0,0,0,.4);backdrop-filter:blur(8px);display:flex;align-items:center;gap:8px}
+
+.hub-body{display:flex;justify-content:space-between;align-items:center;width:100%;flex:1;padding:10px 0}
+.hub-nav-left{display:flex;flex-direction:column;gap:12px;width:320px;text-align:left}
+.hub-btn-card{background:rgba(8,22,16,.86);border:1px solid rgba(35,101,73,.6);border-left:5px solid #236549;border-radius:14px;padding:12px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s;box-shadow:0 4px 18px rgba(0,0,0,.4);backdrop-filter:blur(8px);color:#fff}
+.hub-btn-card:hover{transform:translateX(6px) scale(1.02);border-color:var(--ac);border-left-color:var(--ac);background:rgba(12,38,28,.92);box-shadow:0 0 22px rgba(242,183,5,.25)}
+.hub-btn-card.primary{background:linear-gradient(135deg,rgba(10,143,90,.9) 0%,rgba(6,36,25,.9) 100%);border-color:var(--ac);border-left-color:var(--ac);box-shadow:0 0 20px rgba(10,143,90,.4)}
+.hub-btn-card.primary:hover{box-shadow:0 0 26px rgba(242,183,5,.4)}
+.btn-icon{font-size:26px}
+.btn-text b{display:block;font-size:16px;font-weight:800;color:#fff}
+.btn-text span{display:block;font-size:12px;color:#a0ceb6;margin-top:2px}
+
+.hub-bus-card{width:310px;background:rgba(8,22,16,.86);border:1px solid rgba(242,183,5,.3);border-radius:16px;padding:16px;box-shadow:0 6px 24px rgba(0,0,0,.45);backdrop-filter:blur(8px);text-align:left}
+.hub-bus-card h3{margin:0 0 4px 0;color:var(--ac);font-size:17px;font-weight:800}
+.hub-bus-card p{margin:0 0 12px 0;color:#9ec8b2;font-size:12px}
+.spec-bar-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;font-weight:700;color:#fff}
+.spec-bar-track{width:120px;height:7px;background:rgba(255,255,255,.15);border-radius:4px;overflow:hidden}
+.spec-bar-fill{height:100%;background:var(--ac);border-radius:4px}
+.rotate-hint{margin-top:10px;font-size:11px;color:#f2b705;text-align:center;background:rgba(242,183,5,.1);padding:4px 8px;border-radius:8px;border:1px dashed rgba(242,183,5,.3)}
+
+.hub-footer{width:100%;padding:10px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#85ab97;border-top:1px solid rgba(255,255,255,.08)}
+.safety-slogan{color:var(--ac);font-weight:700}
+
+/* Bangladesh ETS2 GPS Map Screen */
+#map-container{width:min(940px,95vw);height:min(530px,72vh);background:radial-gradient(circle at 45% 45%,#0d2332 0%,#040d14 100%);border:2px solid rgba(242,183,5,.4);border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.85);display:flex;flex-direction:row;overflow:hidden;position:relative}
+#bd-map{flex:1;position:relative;background:radial-gradient(circle at 50% 50%,#0e2638 0%,#07141f 100%);overflow:hidden;cursor:crosshair}
+#bd-map svg{width:100%;height:100%;position:absolute;inset:0}
+#route-sidebar{width:310px;background:rgba(5,15,22,.95);border-left:1px solid rgba(242,183,5,.3);padding:16px;display:flex;flex-direction:column;gap:10px;text-align:left;overflow-y:auto}
+
+.map-node{position:absolute;width:20px;height:20px;border-radius:50%;background:#0a8f5a;border:3px solid #fff;box-shadow:0 0 14px #0a8f5a;cursor:pointer;transform:translate(-50%,-50%);transition:all .25s;z-index:10}
+.map-node:hover,.map-node.active{transform:translate(-50%,-50%) scale(1.4);background:var(--ac);box-shadow:0 0 22px var(--ac);border-color:#fff}
+.map-node.locked{background:#444;border-color:#777;box-shadow:none;cursor:not-allowed}
+.map-label{position:absolute;font-size:11px;font-weight:800;color:#fff;background:rgba(2,8,14,.85);border:1px solid rgba(255,255,255,.2);padding:2px 7px;border-radius:5px;white-space:nowrap;transform:translate(-50%,14px);pointer-events:none;box-shadow:0 2px 6px rgba(0,0,0,.6)}
+
+/* In-game ETS2 Route Advisor GPS Unit */
+#route-advisor{position:absolute;bottom:14px;right:14px;width:176px;background:rgba(6,16,24,.92);border:2px solid rgba(242,183,5,.5);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.6);overflow:hidden;pointer-events:none;z-index:6;backdrop-filter:blur(6px)}
+.ra-header{background:rgba(10,32,48,.95);padding:4px 8px;display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:800;color:#9eccd8;border-bottom:1px solid rgba(242,183,5,.3)}
+#mini-gps{display:block;background:#06121c;width:100%;height:110px}
+.ra-footer{background:rgba(8,22,34,.95);padding:4px 8px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;color:#fff;border-top:1px solid rgba(255,255,255,.1)}
+#ra-dist-rem{color:var(--ac);font-weight:800}
+
+/* In-game HUD & Dashboard */
+#hud{position:fixed;inset:0;pointer-events:none;display:none;z-index:2}
+.top{position:absolute;top:env(safe-area-inset-top);left:0;right:0;display:flex;justify-content:space-between;gap:6px;padding:8px}
+.p{background:var(--pn);border-radius:10px;padding:6px 10px;font-size:13px;line-height:1.4}
+#bp{pointer-events:auto;padding:6px 12px}
+#bar{position:absolute;top:calc(env(safe-area-inset-top) + 70px);left:50%;width:min(300px,50vw);height:6px;background:#274;border-radius:3px;transform:translateX(-50%)}
+#bf{display:block;height:100%;width:0;background:var(--ac);border-radius:3px}
+#toast{position:absolute;top:22%;left:50%;transform:translateX(-50%);font-size:22px;color:var(--ac);text-shadow:0 2px 8px #000;text-align:center;pointer-events:none;z-index:6}
+#helper-bubble{position:absolute;top:26%;left:20px;font-size:15px;font-weight:700;color:#fff;background:rgba(12,36,25,.92);border-left:4px solid var(--ac);padding:8px 16px;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,.5);display:none;pointer-events:none;z-index:6}
+
+#h2{position:absolute;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);pointer-events:none}
+#h2 .pill{position:absolute;background:rgba(8,20,16,.65);border:1px solid rgba(242,183,5,.5);border-radius:16px;padding:5px 14px;font-size:13px;font-weight:600}
+.pb{display:block;height:5px;background:rgba(255,255,255,.2);border-radius:3px;margin-top:3px;overflow:hidden}.pb u{display:block;height:100%;width:0;background:var(--ac);text-decoration:none}
+#spd{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:min(200px,30vw);pointer-events:none}
+#a6{position:absolute;right:10px;top:8px;display:flex;gap:6px;pointer-events:none}
+.tb2{pointer-events:auto;width:40px;height:40px;padding:0;border-radius:50%;background:rgba(8,20,16,.6);font-size:16px;border:1px solid rgba(255,255,255,.3);color:#fff}
+.tk{pointer-events:auto;position:absolute;border-radius:50%;padding:0;background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.5);font-size:18px;color:#fff}
+.tk.dn,.tb2.dn{background:var(--ac);color:#000}.pd{border-radius:22px}.gs{background:rgba(46,204,113,.35);border-color:#2ecc71}.br{background:rgba(255,82,82,.35);border-color:#ff5252}
+#tc2{position:absolute;inset:0;display:none;pointer-events:none}
+#rot{display:none;position:fixed;inset:0;z-index:20;background:#0b1a14;color:var(--ac);align-items:center;justify-content:center;font-size:22px;text-align:center;padding:24px}
+@media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
+#splash{position:fixed;inset:0;z-index:99;background:linear-gradient(135deg,#0b1a14 0%,#16382b 50%,#0b1a14 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;color:var(--ac);font-size:clamp(28px,6vw,48px);font-weight:900;text-shadow:0 0 30px rgba(242,183,5,.6);transition:opacity .6s}#splash.hide{opacity:0;pointer-events:none}
+#ld{position:fixed;inset:0;z-index:9;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--ac);font-size:20px;padding:20px;text-align:center}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<!-- In-Game HUD with ETS2 Route Advisor -->
+<div id="hud">
+  <div class="top"><div class="p" id="hl"></div><div class="p" id="hc"></div><button id="bp">❚❚</button></div>
+  <div id="bar"><i id="bf"></i></div>
+  <div id="toast"></div>
+  <div id="helper-bubble">🗣️ <b>হেলপার:</b> <span id="helper-txt"></span></div>
+  <div id="h2">
+    <div class="pill" id="a1" style="left:12px;top:8px"></div>
+    <div class="pill" id="a2" style="left:50%;transform:translateX(-50%);top:8px;text-align:center;min-width:170px">
+      <b id="a3"></b><br><span id="a4"></span><i class="pb"><u id="a5"></u></i>
+    </div>
+    <div id="a6"></div>
+    <canvas id="spd" width="220" height="160"></canvas>
+    <div id="tc2"></div>
+    <!-- ETS2 GPS Route Advisor Widget -->
+    <div id="route-advisor">
+      <div class="ra-header">
+        <span>🧭 ROUTE ADVISOR</span>
+        <span id="ra-spd-limit">🚸 ৮০ কিমি</span>
+      </div>
+      <canvas id="mini-gps" width="176" height="110"></canvas>
+      <div class="ra-footer">
+        <div id="ra-turn-hint">⬆️ সোজা এগিয়ে যান</div>
+        <div id="ra-dist-rem">৪.২ কিমি</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AAA Simulator Hub Main Menu -->
+<div class="scr on" id="menu">
+  <div class="hub-header">
+    <div class="driver-card">
+      <div class="driver-avatar">🧑‍✈️</div>
+      <div class="driver-meta">
+        <b id="hub-driver-name">ওস্তাদ রফিক</b>
+        <span id="hub-driver-rank">⭐ লেভেল ৩ · হাইওয়ে মাস্টার</span>
+      </div>
+    </div>
+    <div class="hub-center-title">
+      <h1>বাস সিমুলেটর বাংলাদেশ</h1>
+      <span>BANGLADESH HIGHWAY SIMULATOR · PRO 3D</span>
+    </div>
+    <div class="hub-economy">
+      <div class="econ-badge" id="hub-wallet">💰 ৳১৫,৪০০</div>
+      <button class="tb2" id="hub-btn-mute" title="সাউন্ড">🔊</button>
+      <button class="tb2" id="hub-btn-rain" title="আবহাওয়া">🌦️</button>
+    </div>
+  </div>
+
+  <div class="hub-body">
+    <div class="hub-nav-left">
+      <div class="hub-btn-card primary" id="btn-open-map">
+        <div class="btn-icon">🗺️</div>
+        <div class="btn-text">
+          <b>ক্যারিয়ার যাত্রা (Career Mode)</b>
+          <span>বাংলাদেশ জিপিএস ম্যাপ থেকে রুট নির্বাচন</span>
+        </div>
+      </div>
+      <div class="hub-btn-card" id="btn-open-garage">
+        <div class="btn-icon">🚌</div>
+        <div class="btn-text">
+          <b>বাস গ্যারেজ ও বহর (Bus Fleet)</b>
+          <span>হিনো, স্ক্যানিয়া ও হুন্দাই বাস পরিবর্তন</span>
+        </div>
+      </div>
+      <div class="hub-btn-card" id="btn-free-drive">
+        <div class="btn-icon">⚡</div>
+        <div class="btn-text">
+          <b>ফ্রি হাইওয়ে ড্রাইভ (Free Cruise)</b>
+          <span>পদ্মা সেতু এক্সপ্রেসওয়েতে মুক্ত ড্রাইভ</span>
+        </div>
+      </div>
+      <div class="hub-btn-card" id="ms">
+        <div class="btn-icon">⚙️</div>
+        <div class="btn-text">
+          <b>গেম সেটিংস (Settings)</b>
+          <span>গ্রাফিক্স, সাউন্ড ও স্টিয়ারিং সমন্বয়</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hub-bus-card">
+      <h3 id="hub-bus-name">Hino 1J (হানিফ এন্টারপ্রাইজ)</h3>
+      <p id="hub-bus-desc">হাইওয়ের অবিসংবাদিত রাজা! টার্বো ডিজেল ইঞ্জিন ও এয়ার ব্রেক।</p>
+      
+      <div class="spec-bar-row">
+        <span>ইঞ্জিন ক্ষমতা (Power)</span>
+        <span id="hub-spec-hp" style="color:var(--ac)">260 HP</span>
+      </div>
+      <div class="spec-bar-track" style="width:100%;margin-bottom:10px">
+        <div class="spec-bar-fill" id="hub-fill-hp" style="width:75%"></div>
+      </div>
+
+      <div class="spec-bar-row">
+        <span>সর্বোচ্চ গতি (Top Speed)</span>
+        <span id="hub-spec-spd" style="color:var(--ac)">120 km/h</span>
+      </div>
+      <div class="spec-bar-track" style="width:100%;margin-bottom:10px">
+        <div class="spec-bar-fill" id="hub-fill-spd" style="width:82%"></div>
+      </div>
+
+      <div class="spec-bar-row">
+        <span>এয়ার ব্রেক এফিসিয়েন্সি</span>
+        <span id="hub-spec-brk" style="color:var(--ac)">Air 95%</span>
+      </div>
+      <div class="spec-bar-track" style="width:100%;margin-bottom:10px">
+        <div class="spec-bar-fill" id="hub-fill-brk" style="width:95%"></div>
+      </div>
+
+      <div class="rotate-hint">
+        🔄 মাউস বা আঙুল দিয়ে বাসটি ৩৬০° ঘুরিয়ে দেখুন
+      </div>
+    </div>
+  </div>
+
+  <div class="hub-footer">
+    <div>বাংলাদেশ সড়ক পরিবহন কর্পোরেশন (BRTC) অনুমোদিত রুট নেটওয়ার্ক</div>
+    <div class="safety-slogan">"সময়ের চেয়ে জীবনের মূল্য অনেক বেশি · সাবধানে ড্রাইভ করুন"</div>
+    <div>সংস্করণ: প্রো ৪.২</div>
+  </div>
+</div>
+
+<!-- Bangladesh GPS Route Map Screen (ETS2 Style) -->
+<div class="scr" id="map-scr">
+  <h1 style="font-size:26px">🗺️ বাংলাদেশ হাইওয়ে জিপিএস রুট ম্যাপ</h1>
+  <p class="sub" style="margin-bottom:6px">আপনার গন্তব্য সিলেক্ট করে যাত্রা শুরু করুন (লকড রুটগুলো লেভেল বৃদ্ধির সাথে আনলক হবে)</p>
+  <div id="map-container">
+    <div id="bd-map"></div>
+    <div id="route-sidebar">
+      <h3 id="rs-title" style="margin:0;color:var(--ac)">পদ্মা সেতু এক্সপ্রেসওয়ে</h3>
+      <div style="font-size:13px;color:#9ec8b2" id="rs-status">স্ট্যাটাস: <b style="color:#2ecc71">আনলকড (Ready)</b></div>
+      <div style="font-size:13px;line-height:1.6" id="rs-info">
+        🛣️ <b>দূরত্ব:</b> ৪,২০০ মিটার (এক্সপ্রেসওয়ে)<br>
+        ⏱️ <b>আনুমানিক সময়:</b> ৫ মিনিট<br>
+        💰 <b>ভাড়া উপার্জন:</b> ৳২,৪৫০<br>
+        🌉 <b>আকর্ষণ:</b> পদ্মা সেতু, টোল প্লাজা, ভাঙ্গা জংশন
+      </div>
+      <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+        <button class="pri" id="btn-confirm-route" style="width:100%">যাত্রা শুরু করুন (Depart) ➔</button>
+        <button id="btn-close-map" style="width:100%">ফিরে যান</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3D Bus Garage / Showroom Screen -->
+<div class="scr" id="garage-scr">
+  <h1 style="font-size:26px">🚌 বাস গ্যারেজ ও শোরুম</h1>
+  <p class="sub">আসল বাস মডেল ও স্পেসিফিকেশন নির্বাচন করুন</p>
+  <div class="row" id="gb"></div>
+  <div class="row" style="margin-top:14px">
+    <button class="pri" id="btn-garage-drive">এই বাস নিয়ে ড্রাইভ করুন</button>
+    <button id="btn-garage-back">ফিরে যান</button>
+  </div>
+</div>
+
+<!-- Settings Screen -->
+<div class="scr" id="set">
+  <h1 data-i="set"></h1>
+  <label><span data-i="vol"></span><input type="range" id="sv" min="0" max="1" step=".05"></label>
+  <label><span data-i="sens"></span><input type="range" id="ss" min=".5" max="1.5" step=".1"></label>
+  <div class="row"><span data-i="gfx"></span><span class="row" id="sq"></span></div>
+  <div class="row"><span data-i="sunDist"></span><span class="row" id="ssd"></span></div>
+  <div class="row"><button id="sl"></button><button id="sr"></button><button id="sm"></button></div>
+  <button class="pri" id="sb" data-i="back"></button>
+</div>
+
+<!-- Pause Screen -->
+<div class="scr" id="pause">
+  <h1 data-i="paused"></h1>
+  <button class="pri" id="pr" data-i="resume"></button>
+  <button id="pt" data-i="restart"></button>
+  <button id="ps" data-i="set"></button>
+  <button id="pm" data-i="menu"></button>
+</div>
+
+<!-- End Screen -->
+<div class="scr" id="end">
+  <h1 id="et"></h1>
+  <div class="p" id="eb"></div>
+  <div class="row"><button class="pri" id="er" data-i="restart"></button><button id="em" data-i="menu"></button></div>
+</div>
+
+<div id="splash"><div>BUS SIMULATOR</div><div style="font-size:clamp(14px,3vw,20px);color:#9ec8b2;font-weight:600">WEB EDITION</div></div>
+<div id="ld">Loading 3D Engine & Textures…</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+"use strict";
+/**
+ * BANGLADESH BUS SIMULATOR 3D (PRO MERGED EDITION)
+ * Preserves 100% of the original rich graphics, textures, procedural lighting,
+ * and detailed vehicle extrusions while integrating:
+ * 1. Interactive Bangladesh GPS Highway Route Selector
+ * 2. In-game ETS2 Route Advisor GPS Mini-map
+ * 3. Hino Diesel Engine Rumble, Turbo Whistle & Air Brake Pshhh Sound
+ * 4. Helper Voice Navigation Cues
+ * 5. AAA Simulator Hub Main Menu with 360 Turntable Drag
+ * 6. Zero Texture Shuttering / Non-Recursive Road Curvature
+ */
+
+const $=id=>document.getElementById(id),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
+window.addEventListener("error",e=>{const d=document.createElement("div");d.style.cssText="position:fixed;inset:0;background:#111;color:#ff5252;padding:20px;z-index:9999;overflow:auto;font-family:monospace;white-space:pre-wrap";d.textContent="JS Error: "+e.message+"\n"+e.filename+":"+e.lineno+":"+e.colno+"\n"+(e.error&&e.error.stack?e.error.stack:"");document.body.appendChild(d)});
+onerror=m=>{$("ld").style.display="flex";$("ld").textContent="Error: "+m};
+
+const TOUCH="ontouchstart" in window||navigator.maxTouchPoints>0;
+const S={lang:"bn",vol:.75,sens:1,q:"high",rain:false,mute:false,bus:0,mode:"career",route:0,money:1500,level:1,sunDist:1};
+try{Object.assign(S,JSON.parse(localStorage.bbs_pro_save||"{}"))}catch(e){}
+const save=()=>{try{localStorage.bbs_pro_save=JSON.stringify(S)}catch(e){}};
+
+const T={
+  en:{title:"Bangladesh Bus Simulator",free:"Free Drive",career:"Career",park:"Parking",hwy:"Highway",time:"Time Challenge",start:"Start driving",set:"Settings",resume:"Resume",restart:"Restart",menu:"Main menu",back:"Back",paused:"Paused",vol:"Volume",sens:"Steering",gfx:"Graphics",low:"Low",med:"Medium",high:"High",sunDist:"Sun Distance",done:"Journey complete",fail:"Journey failed",earn:"Earnings",col:"Collisions",tt:"Time",next:"Next",left:"left",eta:"ETA",pax:"Passengers",board:"Boarding passengers…",crash:"Collision!",spd:"Speeding fine!",fuel:"Out of fuel",miss:"Missed stop",late:"Time is up",pk:"Park inside the box",pkd:"Parked!",wallet:"Wallet",bal:"Balance",rain:"Rain",lang:"বাংলা",mute:"Mute",stop:"Stop at the green zone",hint:"W/S drive · A/D steer · G gear · Space handbrake · H horn · C camera",hintT:"Hold GAS to drive · ◀ ▶ steer · G▲/G▼ gear · P handbrake · 🔊 horn"},
+  bn:{title:"বাংলাদেশ বাস সিমুলেটর ৩ডি",free:"মুক্ত ড্রাইভ",career:"ক্যারিয়ার",park:"পার্কিং",hwy:"হাইওয়ে",time:"সময় চ্যালেঞ্জ",start:"ড্রাইভ শুরু",set:"সেটিংস",resume:"চালিয়ে যান",restart:"আবার শুরু",menu:"মূল মেনু",back:"ফিরে যান",paused:"বিরতি",vol:"ভলিউম",sens:"স্টিয়ারিং",gfx:"গ্রাফিক্স",low:"কম",med:"মাঝারি",high:"উচ্চ",sunDist:"সূর্যের দূরত্ব",done:"যাত্রা সম্পন্ন",fail:"যাত্রা ব্যর্থ",earn:"উপার্জন",col:"সংঘর্ষ",tt:"সময়",next:"পরবর্তী",left:"বাকি",eta:"পৌঁছাবে",pax:"যাত্রী",board:"যাত্রী উঠছে…",crash:"সংঘর্ষ!",spd:"গতিসীমা জরিমানা!",fuel:"জ্বালানি শেষ",miss:"স্টপ মিস",late:"সময় শেষ",pk:"বাক্সের ভেতরে পার্ক করুন",pkd:"পার্ক সম্পন্ন!",wallet:"ওয়ালেট",bal:"ব্যালেন্স",rain:"বৃষ্টি",lang:"English",mute:"মিউট",stop:"সবুজ জোনে থামুন",hint:"W/S চালান · A/D ঘোরান · G গিয়ার · Space হ্যান্ডব্রেক · H হর্ন · C ক্যামেরা",hintT:"GAS চেপে চালান · ◀ ▶ ঘোরান · G▲/G▼ গিয়ার · P হ্যান্ডব্রেক · 🔊 হর্ন"}
+};
+const t=k=>T[S.lang][k]||k,li=()=>S.lang=="bn"?1:0,BD="০১২৩৪৫৬৭৮৯",nb=s=>S.lang=="bn"?String(s).replace(/\d/g,d=>BD[d]):String(s);
+
+/* ---------- Bangladesh Routes (GPS Network) ---------- */
+const MAP_ROUTES=[
+  {
+    id:0,
+    n:["Dhaka–Padma–Bhanga","ঢাকা–পদ্মা–ভাঙ্গা এক্সপ্রেসওয়ে"],
+    origin:"ঢাকা",dest:"ভাঙ্গা",
+    len:4200,tollZ:-1200,bridgeZ0:-1400,bridgeZ1:-2600,
+    x0:50,y0:50, x1:46,y1:64,
+    dist:"৫৫ কিমি",time:"৪৫ মি.",fare:2450,
+    locked:false,reqLvl:1,reqMoney:0,
+    st:[["Postagola","পোস্তগোলা"],["Padma Toll Plaza","পদ্মা টোল প্লাজা"],["Padma Bridge","পদ্মা সেতু"],["Bhanga","ভাঙ্গা"]],
+    desc:"পদ্মা বহুমুখী সেতু, ৮ লেনের এক্সপ্রেসওয়ে ও আধুনিক টোল প্লাজা।"
+  },
+  {
+    id:1,
+    n:["Dhaka–Cumilla–Chattogram","ঢাকা–কুমিল্লা–চট্টগ্রাম"],
+    origin:"ঢাকা",dest:"চট্টগ্রাম",
+    len:5200,tollZ:-1000,bridgeZ0:-1800,bridgeZ1:-2500,
+    x0:50,y0:50, x1:76,y1:74,
+    dist:"২৪৫ কিমি",time:"৪ ঘণ্টা",fare:3600,
+    locked:false,reqLvl:1,reqMoney:0,
+    st:[["Jatrabari","যাত্রাবাড়ী"],["Daudkandi","দাউদকান্দি"],["Chandina","চান্দিনা"],["Cumilla","কুমিল্লা"]],
+    desc:"মেঘনা ও গোমতী সেতু, কুমিল্লার বিশ্বরোড ফুড ভিলেজ এবং ফেনী বাইপাস।"
+  },
+  {
+    id:2,
+    n:["Dhaka–Sreemangal–Sylhet","ঢাকা–শ্রীমঙ্গল–সিলেট"],
+    origin:"ঢাকা",dest:"সিলেট",
+    len:4800,tollZ:-900,bridgeZ0:-1700,bridgeZ1:-2300,
+    x0:50,y0:50, x1:78,y1:28,
+    dist:"২৪০ কিমি",time:"৩.৫ ঘণ্টা",fare:3200,
+    locked:false,reqLvl:1,reqMoney:0,
+    st:[["Sayedabad","সায়েদাবাদ"],["Bhairab","ভৈরব"],["Sreemangal","শ্রীমঙ্গল"],["Sylhet","সিলেট"]],
+    desc:"ভৈরব মেঘনা ব্রিজ, শ্রীমঙ্গলের আঁকাবাঁকা চা বাগান ও সবুজ পাহাড়ি পথ।"
+  },
+  {
+    id:3,
+    n:["Dhaka–Jamuna–Bogura","ঢাকা–যমুনা সেতু–বগুড়া"],
+    origin:"ঢাকা",dest:"বগুড়া",
+    len:5400,tollZ:-1100,bridgeZ0:-2000,bridgeZ1:-2800,
+    x0:50,y0:50, x1:28,y1:38,
+    dist:"২২০ কিমি",time:"৩.৫ ঘণ্টা",fare:4100,
+    locked:false,reqLvl:1,reqMoney:0,
+    st:[["Gabtoli","গাবতলী"],["Chandra","চন্দ্রা"],["Jamuna Bridge","যমুনা সেতু"],["Bogura","বগুড়া"]],
+    desc:"বঙ্গবন্ধু যমুনা বহুমুখী সেতু ও উত্তরবঙ্গের বনলতা হাইওয়ে।"
+  },
+  {
+    id:4,
+    n:["Bhanga–Khulna–Sundarbans","ভাঙ্গা–খুলনা–সুন্দরবন"],
+    origin:"ভাঙ্গা",dest:"খুলনা",
+    len:4600,tollZ:-1000,bridgeZ0:-1600,bridgeZ1:-2200,
+    x0:46,y0:64, x1:35,y1:76,
+    dist:"১৩০ কিমি",time:"২ ঘণ্টা",fare:3800,
+    locked:false,reqLvl:1,reqMoney:0,
+    st:[["Bhanga","ভাঙ্গা"],["Gopalganj","গোপালগঞ্জ"],["Rupsha Bridge","রূপসা সেতু"],["Khulna","খুলনা"]],
+    desc:"দক্ষিণবঙ্গের রূপসা সেতু, খানজাহান আলী রোড ও সুন্দরবন উপকূলীয় পথ।"
+  },
+  {
+    id:5,
+    n:["Chattogram–Inani–Cox's Bazar","চট্টগ্রাম–কক্সবাজার মেরিন ড্রাইভ"],
+    origin:"চট্টগ্রাম",dest:"কক্সবাজার",
+    len:6000,tollZ:-800,bridgeZ0:-2200,bridgeZ1:-3000,
+    x0:76,y0:74, x1:86,y1:92,
+    dist:"১৫০ কিমি",time:"২.৫ ঘণ্টা",fare:5000,
+    locked:false,reqLvl:1,reqMoney:0,
+    st:[["Karnafuli","কর্ণফুলী"],["Lohagara","লোহাগাড়া"],["Ramu","রামু"],["Cox's Bazar","কক্সবাজার"]],
+    desc:"একপাশে বিশাল বঙ্গোপসাগর, অন্যপাশে সবুজ পাহাড়—বিশ্বের দীর্ঘতম মেরিন ড্রাইভ!"
+  },
+  {
+    id:6,
+    n:["Dimla–Rangpur","ডিমলা–রংপুর হাইওয়ে"],
+    origin:"ডিমলা",dest:"রংপুর",
+    len:20000,tollZ:-5000,bridgeZ0:-8000,bridgeZ1:-8000,
+    x0:32,y0:8, x1:34,y1:18,
+    dist:"৮৫ কিমি",time:"১.৫ ঘণ্টা",fare:2800,
+    locked:false,reqLvl:1,reqMoney:0,
+    st:[["Dimla","ডিমলা"],["Domar","ডোমার"],["Nilphamari","নীলফামারী"],["Rangpur","রংপুর"]],
+    desc:"ডিমলা থেকে রংপুর—গ্রাম, বাজার, তিস্তা করিডর ও শহরপ্রবেশের পথ।"
+  }
+];
+
+const B=[
+  {n:"Padma Express (Hino 1J RM2)",c:0x0a8f5a,p:1.05,hp:"260 HP",spd:"120 km/h",brk:"Air 95%",desc:"হাইওয়ের অবিসংবাদিত রাজা! সিগনেচার এয়ার হর্ন ও টার্বো ইঞ্জিন।"},
+  {n:"Meghna Coach (Volvo B11R Luxury)",c:0xc62828,p:1.15,hp:"380 HP",spd:"135 km/h",brk:"EBS 96%",desc:"বিলাসবহুল অ্যারোডাইনামিক লং-হাওল ভিআইপি কোচ।"},
+  {n:"Jamuna Deluxe (Scania Multi-Axle)",c:0x1565c0,p:1.20,hp:"410 HP",spd:"140 km/h",brk:"Air Dual 98%",desc:"১৩.২ মিটার মাল্টি-অ্যাক্সেল স্লিপার কোচ! সর্বোচ্চ গতি ও আরাম।"}
+];
+
+const Q={low:{n:140,tr:10,sh:0,pr:1},med:{n:300,tr:16,sh:1,pr:1.5},high:{n:560,tr:22,sh:2,pr:2}};
+
+/* Non-recursive Highway Curvature */
+const baseCurve=z=>Math.sin(z/280)*36*Math.min(1,Math.abs(z)/350);
+const cx=z=>{
+  const r=MAP_ROUTES[S.route]||MAP_ROUTES[0];
+  if(z<=r.bridgeZ0&&z>=r.bridgeZ1)return baseCurve(r.bridgeZ0);
+  if(z<r.bridgeZ1)return baseCurve(r.bridgeZ0)+Math.sin((z-r.bridgeZ1)/260)*30;
+  return baseCurve(z);
+};
+const rh=z=>Math.atan2(cx(z-5)-cx(z+5),10);
+
+/* ---------- Engine State ---------- */
+let renderer,scene,cam,sun,hemi,spot,ambient,fill,sunDisk,world,busG,body,wF=[],wR=[],swh,hlM,tlM,indM={},traffic=[],rain,rd=[],bumps=[],bridges=[],stopsZ=[],pad=null,roadMat,sunMat,wetS=0;
+const P={x:-3,z:0,h:0,v:0,steer:0,rpm:800,sy:0,sv:0,roll:0,pitch:0,fuel:100,thr:0,wr:0,eng:true,gear:1,tod:.12,acc:0,airPressure:100};
+let G={state:"menu"},camM=0,lights=false,ind=0,blink=false,prev="menu",helperTimer=0;
+let menuOrbitAngle=0.8, isDraggingTurntable=false, lastPointerX=0;
+const K={};
+
+/* ---------- Audio System: Engine + Turbo Whistle + Air Brake Release ---------- */
+let AC,mg,eo,eg,turboOsc,turboGain,hg,rg,sg;
+function audioInit(){
+  if(AC)return;
+  try{
+    AC=new(window.AudioContext||window.webkitAudioContext)();
+    mg=AC.createGain();mg.connect(AC.destination);
+
+    eo=AC.createOscillator();eo.type="sawtooth";
+    const f=AC.createBiquadFilter();f.type="lowpass";f.frequency.value=420;
+    eg=AC.createGain();eg.gain.value=0;
+    eo.connect(f);f.connect(eg);eg.connect(mg);eo.start();
+
+    // Turbo Whistle
+    turboOsc=AC.createOscillator();turboOsc.type="sine";
+    const tf=AC.createBiquadFilter();tf.type="bandpass";tf.frequency.value=2800;tf.Q.value=6;
+    turboGain=AC.createGain();turboGain.gain.value=0;
+    turboOsc.connect(tf);tf.connect(turboGain);turboGain.connect(mg);turboOsc.start();
+
+    // Multi-tone Hydraulic Air Horn
+    hg=AC.createGain();hg.gain.value=0;hg.connect(mg);
+    [330,415,523].forEach(fr=>{
+      const o=AC.createOscillator();o.type="triangle";o.frequency.value=fr;
+      const sub=AC.createGain();sub.gain.value=0.33;
+      o.connect(sub);sub.connect(hg);o.start();
+    });
+
+    const b=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+    const n=AC.createBufferSource();n.buffer=b;n.loop=true;
+    const bf=AC.createBiquadFilter();bf.type="bandpass";bf.frequency.value=2500;
+    rg=AC.createGain();rg.gain.value=0;sg=AC.createGain();sg.gain.value=0;
+    n.connect(bf);bf.connect(rg);bf.connect(sg);rg.connect(mg);sg.connect(mg);n.start();
+  }catch(e){AC=null}
+}
+
+function playAirBrakePshhh(){
+  if(!AC||S.mute)return;
+  try{
+    const dur=0.32, buf=AC.createBuffer(1,AC.sampleRate*dur,AC.sampleRate), data=buf.getChannelData(0);
+    for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.exp(-i/(AC.sampleRate*0.09));
+    const src=AC.createBufferSource();src.buffer=buf;
+    const f=AC.createBiquadFilter();f.type="bandpass";f.frequency.value=1800;
+    const g=AC.createGain();g.gain.value=0.18*S.vol;
+    src.connect(f);f.connect(g);g.connect(AC.destination);
+    src.start();
+  }catch(e){}
+}
+
+function blip(){
+  if(!AC)return;
+  try{
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.frequency.value=140;g.gain.value=.1;o.connect(g);g.connect(mg);o.start();o.stop(AC.currentTime+.07);
+  }catch(e){}
+}
+
+function audio(){
+  if(!AC)return;
+  const T0=AC.currentTime,pl=G.state=="play",on=P.eng&&pl;
+  mg.gain.value=S.mute?0:S.vol;
+  eo.frequency.setTargetAtTime(on?P.rpm/60*3+4:1,T0,.05);
+  eg.gain.setTargetAtTime(on?.05+P.thr*.09:0,T0,.08);
+  turboOsc.frequency.setTargetAtTime(on?1800+P.thr*2400+(P.rpm/6500)*1200:100,T0,.1);
+  turboGain.gain.setTargetAtTime(on&&P.thr>0.2?0.035*P.thr:0,T0,.1);
+  hg.gain.setTargetAtTime(K.horn&&pl?.14:0,T0,.02);
+  rg.gain.setTargetAtTime(S.rain?.05:0,T0,.3);
+  sg.gain.setTargetAtTime((pl?clamp(P.acc,0,1):0)*.07,T0,.05);
+}
+
+function helperSpeak(msgText){
+  $("helper-txt").textContent=msgText;
+  $("helper-bubble").style.display="block";
+  clearTimeout(helperTimer);
+  helperTimer=setTimeout(()=>{$("helper-bubble").style.display="none"},3800);
+  if("speechSynthesis" in window&&!S.mute){
+    try{
+      const utt=new SpeechSynthesisUtterance(msgText);
+      utt.lang="bn-BD";utt.rate=1.1;window.speechSynthesis.speak(utt);
+    }catch(e){}
+  }
+}
+
+/* ---------- Texture & Material Helpers (With Mipmaps & Zero-Shutter) ---------- */
+function ctex(w,h,fn){
+  const c=document.createElement("canvas");c.width=w;c.height=h;
+  fn(c.getContext("2d"),w,h);
+  const x=new THREE.CanvasTexture(c);
+  x.generateMipmaps=true;
+  x.minFilter=THREE.LinearMipmapLinearFilter;
+  x.magFilter=THREE.LinearFilter;
+  x.wrapS=THREE.ClampToEdgeWrapping;
+  x.wrapT=THREE.ClampToEdgeWrapping;
+  x.anisotropy=Math.min(renderer?renderer.capabilities.getMaxAnisotropy():4,8);
+  return x;
+}
+const rep=x=>{x.wrapS=x.wrapT=THREE.RepeatWrapping;return x};
+function msg(k,raw){G.msg=raw||t(k);G.mt=2.2}
+function show(id){document.querySelectorAll(".scr").forEach(e=>e.classList.toggle("on",e.id==id))}
+const M=(c,r,me)=>new THREE.MeshStandardMaterial({color:c,roughness:r==null?.7:r,metalness:me||0});
+function billboard(txt,x,z){
+  box(.15,4,.15,M(0x888888),x,2,z);
+  const bt=ctex(256,96,(c,w,h)=>{c.fillStyle="#1a237e";c.fillRect(0,0,w,h);c.strokeStyle="#fff";c.lineWidth=3;c.strokeRect(3,3,w-6,h-6);c.fillStyle="#fff";c.font="bold 26px 'Noto Sans Bengali',sans-serif";c.textAlign="center";c.fillText(txt,w/2,h/2+10)});
+  const bp=new THREE.Mesh(new THREE.PlaneGeometry(3,1.2),new THREE.MeshBasicMaterial({map:bt}));
+  bp.position.set(x,4.2,z); world.add(bp);
+  const bp2=bp.clone(); bp2.rotation.y=Math.PI; world.add(bp2);
+}
+function shop(w,h,d,color,x,y,z){
+  box(w,h,d,M(color,.5),x,y,z);
+  const wp=new THREE.Mesh(new THREE.PlaneGeometry(w*.8,h*.6),new THREE.MeshBasicMaterial({map:wt,transparent:true}));
+  wp.position.set(x,y,z+(d/2+.01)); world.add(wp);
+  // roof variety
+  if(Math.random()<.5){
+    box(w+.2,.15,d+.2,M(0x7a8791,.6,.2),x,y+h/2+.075,z);
+  }else{
+    const roof=new THREE.Mesh(new THREE.ConeGeometry(Math.max(w,d)/1.4,1.2,4),M(0x8b3a2b,.7));
+    roof.position.set(x,y+h/2+.6,z); roof.rotation.y=Math.PI/4; world.add(roof);
+  }
+}
+function box(w,h,d,mat,x,y,z,p){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;(p||world).add(o);return o}
+
+/* High-Grade Solid Decal (Prevents Texture Shuttering / Sorting Flutter) */
+function decal(tex){
+  return new THREE.MeshStandardMaterial({
+    map:tex,
+    transparent:true,
+    alphaTest:0.05,
+    depthWrite:true,
+    roughness:0.32,
+    metalness:0.1,
+    polygonOffset:true,
+    polygonOffsetFactor:-1,
+    polygonOffsetUnits:-2
+  });
+}
+
+/* ---------- World Building ---------- */
+function strip(a,b,y,mat,z0,z1,st=8){
+  const p=[],u=[],ix=[];let n=0;
+  for(let z=z0;z>=z1;z-=st,n++){
+    p.push(cx(z)+a,y,z,cx(z)+b,y,z);u.push(0,n,1,n);
+  }
+  for(let i=0;i<n-1;i++){const k=i*2;ix.push(k,k+1,k+2,k+1,k+3,k+2)}
+  const g=new THREE.BufferGeometry();
+  g.setAttribute("position",new THREE.Float32BufferAttribute(p,3));
+  g.setAttribute("uv",new THREE.Float32BufferAttribute(u,2));
+  g.setIndex(ix);g.computeVertexNormals();
+  const m=new THREE.Mesh(g,mat);m.receiveShadow=true;world.add(m);return m;
+}
+
+function inst(g,m,n,f,sh){
+  const im=new THREE.InstancedMesh(g,m,n),d=new THREE.Object3D(),c=new THREE.Color();
+  for(let i=0;i<n;i++){
+    d.rotation.set(0,0,0);d.scale.set(1,1,1);const col=f(i,d);d.updateMatrix();
+    im.setMatrixAt(i,d.matrix);if(col!=null){c.set(col);im.setColorAt(i,c)}
+  }
+  im.castShadow=!!sh;im.receiveShadow=!!sh;im.frustumCulled=false;world.add(im);return im;
+}
+
+let gt,at,dt,wt,smoke=[],people=[],tex0=false;
+function texInit(){
+  if(tex0)return;tex0=true;
+  gt=rep(ctex(64,64,(g,w,h)=>{
+    g.fillStyle="#5c9a3c";g.fillRect(0,0,w,h);
+    for(let i=0;i<260;i++){
+      g.fillStyle=`hsl(${90+rnd(-10,20)},${rnd(35,55)}%,${rnd(28,46)}%)`;
+      g.fillRect(rnd(0,w),rnd(0,h),2,5);
+    }
+  }));
+  at=rep(ctex(64,64,(g,w,h)=>{
+    g.fillStyle="#3a3b3f";g.fillRect(0,0,w,h);
+    for(let i=0;i<400;i++){const v=rnd(40,85)|0;g.fillStyle=`rgb(${v},${v},${v+3})`;g.fillRect(rnd(0,w),rnd(0,h),2,2)}
+  }));at.repeat.set(3,1);
+  dt=rep(ctex(8,32,(g,w,h)=>{g.fillStyle="#fff";g.fillRect(1,0,w-2,h/2)}));
+  wt=rep(ctex(64,64,(g,w,h)=>{g.fillStyle="rgba(30,60,90,.85)";g.fillRect(0,0,w,h);g.fillStyle="rgba(200,220,255,.9)";for(let y=8;y<h;y+=16)for(let x=8;x<w;x+=16){g.fillRect(x,y,8,8)}}));wt.repeat.set(2,3);
+}
+
+function build(){
+  texInit();
+  if(world){scene.remove(world);world.traverse(o=>{if(o.geometry)o.geometry.dispose()})}
+  world=new THREE.Group();scene.add(world);bumps=[];bridges=[];traffic=[];stopsZ=[];pad=null;
+  const r=MAP_ROUTES[S.route]||MAP_ROUTES[0],L=r.len,E=-L-250,q=Q[S.q],n=Math.min(1200,Math.round(q.n*Math.max(1,L/9000)));
+  gt.repeat.set(88,(L+1500)/8);
+
+  const gm=new THREE.Mesh(new THREE.PlaneGeometry(700,L+1500).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({map:gt,roughness:1}));
+  gm.position.set(0,-.02,-L/2);gm.receiveShadow=true;world.add(gm);
+
+  // 3D Luxury Showroom Turntable Stage (Menu & Garage View)
+  const stage=new THREE.Mesh(
+    new THREE.CylinderGeometry(8.8,9.2,0.12,36),
+    new THREE.MeshStandardMaterial({color:0x121820,roughness:0.25,metalness:0.75})
+  );
+  stage.position.set(-3,0.04,0);
+  const ring=new THREE.Mesh(
+    new THREE.RingGeometry(8.2,8.5,36).rotateX(-Math.PI/2),
+    new THREE.MeshBasicMaterial({color:0xf2b705})
+  );
+  ring.position.y=0.07;
+  stage.add(ring);
+  world.add(stage);
+
+  roadMat=new THREE.MeshStandardMaterial({map:at,roughness:.92});
+  const poly=m=>{m.polygonOffset=true;m.polygonOffsetFactor=-2;return m};
+  strip(-6,6,.03,roadMat,40,E,16);
+  strip(-.12,.12,.05,poly(new THREE.MeshBasicMaterial({map:dt,transparent:true,alphaTest:.5})),40,E,16);
+  const wm=poly(new THREE.MeshBasicMaterial({color:0xeeeeee}));
+  strip(-5.8,-5.65,.05,wm,40,E,16);strip(5.65,5.8,.05,wm,40,E,16);
+  const sh=new THREE.MeshStandardMaterial({color:0x6b6256,roughness:1});
+  strip(-9,-6,.02,sh,40,E,16);strip(6,9,.02,sh,40,E,16);
+
+  const xr=M(0x3a3b3f,.95);
+  for(let z=-500;z>E;z-=700){
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(70,11).rotateX(-Math.PI/2),xr);
+    m.position.set(cx(z),.035,z);world.add(m);
+  }
+
+  /* trees, coconut, banana */
+  const tp=[];
+  for(let i=0;i<n;i++){
+    const z=-rnd(0,L+200)+20,s=Math.random()<.5?-1:1;
+    tp.push([cx(z)+s*rnd(11,70),z,rnd(.8,1.5),i%5<2?0:i%5<4?1:2]);
+  }
+  inst(new THREE.CylinderGeometry(.3,.4,2,6),M(0x6b4a2b),n,(i,d)=>{
+    const[x,z,s,c]=tp[i];d.position.set(x,c==1?3.2*s:s*(c?.5:1),z);d.scale.set(s,c==1?s*3.2:c?s*.5:s,s);
+  },q.sh>0);
+  inst(new THREE.ConeGeometry(2.2,5,7),M(0xffffff),n,(i,d)=>{
+    const[x,z,s,c]=tp[i];d.position.set(x,c==1?6.8*s:c?2*s:4.5*s,z);
+    d.scale.set(s*(c==1?1.3:c?.5:1),s*(c==1?.5:c?.5:1),s*(c==1?1.3:c?.5:1));
+    return c==1?0x2e8b3d:c?0x7cc04a:[0x2d6a2d,0x3a7d2a,0x4c8a30][i%3];
+  },q.sh>0);
+
+  /* houses */
+  const hn=n>>1,hp=[];
+  for(let i=0;i<hn;i++){
+    const z=-rnd(0,L+200)+20,s=Math.random()<.5?-1:1;
+    hp.push([cx(z)+s*rnd(13,34),z,Math.random()*.6-.3]);
+  }
+  inst(new THREE.BoxGeometry(5,3,6),M(0xffffff),hn,(i,d)=>{
+    const[x,z,a]=hp[i];d.position.set(x,1.5,z);d.rotation.y=a;
+    return[0xd9cbb0,0x9fc3c4,0xc98b6b,0xe6d9a8][i%4];
+  },q.sh>0);
+  inst(new THREE.BoxGeometry(5.7,.3,6.7),M(0xffffff,.5,.4),hn,(i,d)=>{
+    const[x,z,a]=hp[i];d.position.set(x,3.15,z);d.rotation.y=a;return i%3?0x7a8791:0x8b3a2b;
+  },q.sh>0);
+
+  /* Dimla Bazar starting area */
+  // Bus stand sign
+  const dimlaSign=ctex(320,80,(c,w,h)=>{c.fillStyle="#0d3b2a";c.fillRect(0,0,w,h);c.strokeStyle="#f2b705";c.lineWidth=4;c.strokeRect(2,2,w-4,h-4);c.fillStyle="#f2b705";c.font="bold 34px 'Noto Sans Bengali',sans-serif";c.textAlign="center";c.fillText("ডিমলা বাস স্ট্যান্ড",w/2,h/2+12)});
+  const ds=new THREE.Mesh(new THREE.PlaneGeometry(6,1.5),new THREE.MeshBasicMaterial({map:dimlaSign}));
+  ds.position.set(cx(-5)+8,3.5,-5); world.add(ds);
+  // Ticket counter
+  box(4,2.5,3,M(0xd9cbb0,.6), cx(-8)+10,1.25,-8);
+  box(3.6,.1,2.6,M(0x888888,.4), cx(-8)+10,2.55,-8);
+  // Benches
+  for(let i=0;i<4;i++){ box(1.8,.4,.6,M(0x6b4a2b,.7), cx(-12)+10+ (i-1.5)*3,0.2,-12); }
+  // Destination board
+  const destTex=ctex(256,96,(c,w,h)=>{c.fillStyle="#111";c.fillRect(0,0,w,h);c.fillStyle="#fff";c.font="bold 16px 'Noto Sans Bengali',sans-serif";c.textAlign="left";["রংপুর ৳২৮০০","নীলফামারী ৳১২০","ডোমার ৳৮০"].forEach((t,j)=>c.fillText(t,12,24+j*26))});
+  const db=new THREE.Mesh(new THREE.PlaneGeometry(2.2,1.2),new THREE.MeshBasicMaterial({map:destTex}));
+  db.position.set(cx(-8)+8,2.2,-8); world.add(db);
+  // Market shops along both sides
+  for(let i=0;i<10;i++){
+    const z=-rnd(5,60), side=Math.random()<.5?-1:1, sx=cx(z)+side*rnd(9,14);
+    shop(rnd(3,5),rnd(2.2,3.2),rnd(4,6),[0xd9cbb0,0x9fc3c4,0xc98b6b,0xe6d9a8][i%4], sx, rnd(1.2,1.6), z);
+    if(Math.random()<.6) box(1.6,.6,.08,new THREE.MeshBasicMaterial({color:0xffeb3b}), sx, 2.4, z);
+  }
+  // Rickshaws with wheels
+  for(let i=0;i<2;i++){
+    const z=-25-i*4, x=cx(z)+ (i?6:-6);
+    box(1.2,0.9,2.2,M(0x2b9348,.5), x,0.45,z);
+    const w1=new THREE.Mesh(new THREE.CylinderGeometry(.35,.35,.1,12).rotateZ(Math.PI/2),M(0x111111,.9));
+    w1.position.set(x-0.6,0.35,z-0.8); world.add(w1);
+    const w2=w1.clone(); w2.position.z=z+0.8; world.add(w2);
+  }
+
+  /* smoke particles (tea stall) */
+  const smkTex=ctex(64,64,(c,w,h)=>{const r=c.createRadialGradient(32,32,2,32,32,30);r.addColorStop(0,"rgba(255,255,255,.8)");r.addColorStop(1,"rgba(255,255,255,0)");c.fillStyle=r;c.fillRect(0,0,w,h)});
+  for(let i=0;i<6;i++){
+    const s=new THREE.Sprite(new THREE.SpriteMaterial({map:smkTex,transparent:true,opacity:.6,depthWrite:false}));
+    s.scale.set(1.2,1.2,1); s.position.set(cx(-15)+rnd(-6,6),rnd(2,4),-15+rnd(-4,4));
+    s.userData={vy:rnd(.5,1.2),life:rnd(0,2)}; smoke.push(s); scene.add(s);
+  }
+
+  /* fuel station */
+  box(8,3,5,M(0xd32f2f,.4), cx(-L*.35)+8,1.5,-L*.35);
+  box(1.2,2.5,.6,M(0xffffff,.3), cx(-L*.35)+4,1.25,-L*.35-2);
+  box(1.2,2.5,.6,M(0xffffff,.3), cx(-L*.35)+8,1.25,-L*.35-2);
+  box(1.2,2.5,.6,M(0xffffff,.3), cx(-L*.35)+12,1.25,-L*.35-2);
+
+  /* people sprites (Bengali clothing) */
+  const peopleTex=ctex(64,128,(c,w,h)=>{
+    const shirtColors=["#1565c0","#c62828","#2e7d32","#6a1b9a","#ef6c00","#00838f"];
+    const col=shirtColors[Math.floor(Math.random()*shirtColors.length)];
+    // lungi (lower)
+    c.fillStyle="#e8e8e8"; c.fillRect(14,78,36,40);
+    c.fillStyle="#bdbdbd"; for(let y=78;y<118;y+=6){c.fillRect(14,y,36,2)}
+    // shirt
+    c.fillStyle=col; c.fillRect(16,40,32,40);
+    // head
+    c.fillStyle="#ffcc80"; c.beginPath(); c.arc(32,28,10,0,6.3); c.fill();
+    // arms
+    c.fillStyle=col; c.fillRect(6,44,10,30); c.fillRect(48,44,10,30);
+  });
+  for(let i=0;i<20;i++){
+    const z=-rnd(20,L-20), t=-z/L;
+    if(t>0.35){
+      const side=Math.random()<.5?-1:1;
+      const s=new THREE.Sprite(new THREE.SpriteMaterial({map:peopleTex,transparent:true}));
+      s.scale.set(1.2,2.4,1); s.position.set(cx(z)+ side*rnd(10,18),1.2,z);
+      s.userData={side:side, speed:rnd(0.6,1.4), offset:rnd(10,18)};
+      people.push(s); scene.add(s);
+    }
+  }
+
+  /* billboards (replacing traffic signs) */
+  const billTexts=["ডিমলা বাজার","নীলফামারী ১২ কিমি","তিস্তা ব্যারাজ","রংপুর ৪৫ কিমি","সতর্কতা: মোড়","বাস স্টপ"];
+  for(let i=0;i<6;i++){
+    const z=-rnd(200,L-200);
+    const sx=cx(z)+(Math.random()<.5?-1:1)*rnd(10,14);
+    billboard(billTexts[i%billTexts.length],sx,z);
+  }
+
+  /* Tista Barrage landmark (middle of route) */
+  const tistaZ=-L*0.5;
+  box(60,2,20,M(0x888888,.6), cx(tistaZ),1,tistaZ);
+  for(let i=-3;i<=3;i++){
+    box(2,4,2,M(0x666666,.5), cx(tistaZ)+i*8,2,tistaZ-6);
+    box(2,4,2,M(0x666666,.5), cx(tistaZ)+i*8,2,tistaZ+6);
+  }
+  const water2=new THREE.Mesh(new THREE.PlaneGeometry(80,40).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:0x2f6f92,roughness:.05,metalness:.2}));
+  water2.position.set(cx(tistaZ),0.1,tistaZ); world.add(water2);
+
+  /* road cracks/patches */
+  for(let i=0;i<15;i++){
+    const z=-rnd(50,L-50);
+    const p=new THREE.Mesh(new THREE.PlaneGeometry(rnd(1,3),rnd(1,2)).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0x222222}));
+    p.position.set(cx(z)+rnd(-4,4),.04,z); world.add(p);
+  }
+
+  /* speed limit sign in market segment */
+  const midMarket=-L*0.55;
+  const sxm=cx(midMarket)+(Math.random()<.5?-1:1)*10;
+  billboard("গতি সীমা ৬০", sxm, midMarket);
+
+  /* 4-way crossroad landmark */
+  const cz=-L*0.4;
+  // horizontal road
+  strip(-20,20,.03,roadMat,cz-1,cz+1,16);
+  // central roundabout
+  const round=new THREE.Mesh(new THREE.CylinderGeometry(4,4,0.3,24),M(0x888888,.6));
+  round.position.set(cx(cz),0.15,cz); world.add(round);
+  // landmark obelisk
+  box(1.2,6,1.2,M(0xd9cbb0,.4), cx(cz),3,cz);
+  box(1.6,.3,1.6,M(0xf2b705,.3), cx(cz),6.15,cz);
+  // traffic lights (poles)
+  for(let i=0;i<4;i++){
+    const ang=i*Math.PI/2;
+    const lx=cx(cz)+Math.sin(ang)*6, lz=cz+Math.cos(ang)*6;
+    box(.15,4,.15,M(0x333333),lx,2,lz);
+    box(.6,.4,.1,new THREE.MeshBasicMaterial({color:0xff0000}),lx,4.2,lz);
+  }
+
+  // traffic police at crossroad
+  const px=cx(cz)+2, pz=cz+2;
+  box(.4,1.7,.3,M(0x1a237e,.7), px,.85,pz); // body
+  box(.35,.35,.35,M(0xffcc80,.8), px,1.9,pz); // head
+  box(.45,.15,.45,M(0x1a237e,.7), px,2.1,pz); // cap
+  box(.1,.8,.1,M(0x1a237e,.7), px-.25,1.3,pz); // left arm
+  box(.1,.8,.1,M(0x1a237e,.7), px+.25,1.3,pz); // right arm
+  // whistle
+  box(.08,.08,.08,M(0xffd700,.3,.8), px+.3,1.6,pz+.2);
+
+  /* 2 main bazar points */
+  for(let bi=0;bi<2;bi++){
+    const bz=-L*(0.3+bi*0.4);
+    const bx=cx(bz);
+    for(let i=0;i<6;i++){
+      const side=Math.random()<.5?-1:1;
+      const sx=bx+side*rnd(9,16);
+      shop(rnd(3,5),rnd(2.2,3.5),rnd(4,6),[0xd9cbb0,0x9fc3c4,0xc98b6b,0xe6d9a8][i%4], sx, rnd(1.2,1.8), bz+i*3);
+      if(Math.random()<.6) box(1.6,.6,.08,new THREE.MeshBasicMaterial({color:0xffeb3b}), sx, 2.4, bz+i*3);
+    }
+    // bazar sign
+    const bsz=ctex(256,64,(c,w,h)=>{c.fillStyle="#0d3b2a";c.fillRect(0,0,w,h);c.fillStyle="#f2b705";c.font="bold 24px 'Noto Sans Bengali',sans-serif";c.textAlign="center";c.fillText(bi===0?"ডোমার বাজার":"নীলফামারী বাজার",w/2,h/2+8)});
+    const bsp=new THREE.Mesh(new THREE.PlaneGeometry(5,1.2),new THREE.MeshBasicMaterial({map:bsz}));
+    bsp.position.set(bx+8,3.5,bz); world.add(bsp);
+  }
+
+  /* terminals */
+  // Dimla bus terminal (start)
+  for(let i=0;i<6;i++){ box(rnd(4,7),rnd(2.5,4),rnd(5,8),M([0xd9cbb0,0x9fc3c4,0xc98b6b][i%3],.5), cx(-i*12)+ (i%2?-1:1)*rnd(12,22), rnd(1.2,2), -i*12-10); }
+  box(18,.1,12,M(0x888888,.6), cx(-40)+16,.05,-40); // parking pad (off-road)
+  // Rangpur terminal (end)
+  for(let i=0;i<8;i++){ box(rnd(6,10),rnd(4,7),rnd(6,10),M([0x7a8791,0x5a6b7c,0x9fc3c4][i%3],.35,.15), cx(-L+i*15)+ (i%2?-1:1)*rnd(14,26), rnd(2,3.5), -L+i*15+10); }
+  box(22,.1,16,M(0x888888,.6), cx(-L+60)+18,.05,-L+60);
+
+  /* roadside segments (Dimla -> Rangpur) */
+  for(let z=0; z>=-L; z-=200){
+    const t=-z/L, x=cx(z), side=Math.random()<.5?-1:1;
+    const sx=x+side*rnd(10,20);
+    if(t<0.2){
+      // Dimla bus stand: dense shops, counters, signs
+      if(Math.random()<.7) box(rnd(3,6),rnd(2.5,4),rnd(4,7),M([0xd9cbb0,0x9fc3c4,0xc98b6b,0xe6d9a8][Math.floor(Math.random()*4)],.6),sx,rnd(1.2,2),z);
+      if(Math.random()<.5) box(.3,4,.3,M(0x555555),sx+side*2,2,z+ (Math.random()<.5?-4:4));
+      if(Math.random()<.4) box(2.2,.8,.1,new THREE.MeshBasicMaterial({color:0xf2b705}),sx,2.6,z);
+    }else if(t<0.45){
+      // rural: tin houses, bamboo, fields
+      if(Math.random()<.45) box(rnd(4,6),rnd(2.2,3.2),rnd(5,7),M(0xffffff,.7),sx,1.6,z);
+      if(Math.random()<.35) box(.12,3,.12,M(0x6b4a2b),sx+side*3,1.5,z);
+      // occasional small bazar
+      if(Math.random()<.08){
+        for(let k=0;k<3;k++){
+          const bx=sx+ (k-1)*4;
+          box(rnd(2.5,4),rnd(2.2,3),rnd(3,5),M([0xd9cbb0,0x9fc3c4,0xc98b6b][k%3],.6), bx, rnd(1.2,1.6), z- k*2);
+          if(Math.random()<.5) box(1.2,.5,.08,new THREE.MeshBasicMaterial({color:0xffeb3b}), bx, 2.2, z- k*2);
+        }
+      }
+    }else if(t<0.65){
+      // market town (Jaldhaka/Nilphamari): dense shops & signs
+      if(Math.random()<.8) shop(rnd(3,5),rnd(2.8,4.2),rnd(4,6),[0x9fc3c4,0xd9cbb0,0xc98b6b,0xe6d9a8][Math.floor(Math.random()*4)],sx,rnd(1.5,2.1),z);
+      if(Math.random()<.6) box(1.8,.7,.1,new THREE.MeshBasicMaterial({color:0xffeb3b}),sx,2.8,z);
+      if(Math.random()<.4) box(.25,5,.25,M(0x888888),sx+side*2,2.5,z);
+    }else if(t<0.85){
+      // corridor: pumps, workshops, urban blocks
+      if(Math.random()<.6) box(rnd(6,9),rnd(3,5),rnd(6,9),M(0x7a8791,.4,.3),sx,2.5,z);
+      if(Math.random()<.3) box(2.5,2.2,2.5,M(0xd32f2f,.6),sx,1.1,z);
+      if(Math.random()<.25) box(3,.05,3,M(0x333333),sx,.05,z);
+    }else{
+      // Rangpur city: large buildings, dense traffic
+      if(Math.random()<.85) shop(rnd(8,14),rnd(5,9),rnd(8,12),[0x9fc3c4,0xd9cbb0,0x7a8791,0x5a6b7c][Math.floor(Math.random()*4)],sx,3,z);
+      if(Math.random()<.4) box(4,3,1,M(0x2b6cb0),sx,1.5,z);
+    }
+    // common: electric poles every ~120m
+    if(Math.abs(z)%120<75 && Math.random()<.5){
+      const px=x+side*9; box(.18,6,.18,M(0x777777),px,3,z); box(.8,.1,.1,M(0x333333),px,6,z);
+    }
+    // traffic signs every ~200m
+    if(Math.abs(z)%200<75 && Math.random()<.4){
+      const sx2=x+side*6; box(.15,3.5,.15,M(0x888888),sx2,1.75,z); box(1.1,.7,.08,new THREE.MeshBasicMaterial({color:0xff0000}),sx2,3.6,z);
+    }
+    // people (billboards) near markets/city
+    if((t>0.45) && Math.random()<.35){
+      const px2=x+side*rnd(8,14); box(.35,1.7,.25,M(0xffffff,.8),px2,.85,z);
+    }
+    // cows in rural
+    if(t>0.2 && t<0.45 && Math.random()<.25){
+      const cx2=x+side*rnd(10,16); box(1.1,.7,1.6,M(0xffffff,.9),cx2,.35,z); box(.25,.25,.25,M(0x111111),cx2,.85,z-0.6);
+    }
+    // culvert/drain
+    if(Math.random()<.15){ box(2,.4,1.5,M(0x555555,.9),x,0.2,z); }
+  }
+
+
+  inst(new THREE.BoxGeometry(14,.05,20),M(0xffffff,1),n>>1,(i,d)=>{
+    const z=-rnd(0,L+200),s=Math.random()<.5?-1:1;d.position.set(cx(z)+s*rnd(16,80),.02,z);
+    return[0x78b04a,0x9bc55a,0xd6c660,0x4f9b3c][i%4];
+  });
+  for(let i=0;i<n/30;i++){
+    const z=-rnd(0,L),s=Math.random()<.5?-1:1,m=new THREE.Mesh(new THREE.CircleGeometry(rnd(5,11),16).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:0x3d7d9b,roughness:.15,metalness:.2}));
+    m.position.set(cx(z)+s*rnd(16,50),.04,z);world.add(m);
+  }
+
+  /* poles */
+  const pn=Math.floor(L/30);
+  inst(new THREE.CylinderGeometry(.12,.16,9,6),M(0x777777),pn,(i,d)=>{
+    const z=-i*30-10;d.position.set(cx(z)+8,4.5,z);
+  },false);
+
+  /* mosques */
+  const wh=M(0xf0ede4,.6),dm=M(0x2f8f5a,.4,.3);
+  for(let i=0;i<4;i++){
+    const z=-L*(i+.5)/4,x=cx(z)+(i%2?1:-1)*20,g=new THREE.Group();
+    g.position.set(x,0,z);world.add(g);box(8,6,8,wh,0,3,0,g);
+    const d=new THREE.Mesh(new THREE.SphereGeometry(3,12,8,0,6.3,0,1.6),dm);d.position.y=6;g.add(d);
+    [-4,4].forEach(m=>{
+      const mn=new THREE.Mesh(new THREE.CylinderGeometry(.5,.6,10,8),wh);mn.position.set(m,5,4);g.add(mn);
+    });
+  }
+
+  /* signs (Bengali) */
+  for(let z=-250;z>-L;z-=500){
+    const km=((L+z)/1000).toFixed(1);
+    const tx=ctex(256,96,(g,w,h)=>{
+      g.fillStyle="#0b6b3a";g.fillRect(0,0,w,h);g.strokeStyle="#fff";g.lineWidth=4;g.strokeRect(3,3,w-6,h-6);
+      g.fillStyle="#fff";g.textAlign="center";
+      g.font="bold 30px 'Noto Sans Bengali',sans-serif";
+      g.fillText((r.n[1]||"").split("–")[1]+" "+km.replace(/\d/g,d=>BD[d])+" কিমি",w/2,42);
+      g.font="20px sans-serif";
+      g.fillText((r.n[0]||"").split("–")[1]+" "+km+" km",w/2,76);
+    });
+    const x=cx(z)-8;
+    box(.15,3.5,.15,M(0x888888),x-1.8,1.75,z);box(.15,3.5,.15,M(0x888888),x+1.8,1.75,z);
+    const sg2=new THREE.Mesh(new THREE.PlaneGeometry(4.2,1.6),new THREE.MeshBasicMaterial({map:tx}));
+    sg2.position.set(x,3.6,z+.1);world.add(sg2);
+  }
+
+  /* stops */
+  const gl=new THREE.MeshBasicMaterial({color:0x22dd77,transparent:true,opacity:.3,depthWrite:false});
+  (r.st||[]).forEach((s,i)=>{
+    const sz=-L*(i+1)/4;stopsZ.push(sz);const x=cx(sz);
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(5,14).rotateX(-Math.PI/2),gl);
+    m.position.set(x-4.7,.07,sz);world.add(m);
+    box(.3,6,.3,new THREE.MeshBasicMaterial({color:0x22dd77}),x-7.5,3,sz-8);
+    box(3,.2,4,M(0x2b6cb0),x-10,2.8,sz);
+    box(.2,2.8,.2,M(0x555555),x-11.3,1.4,sz-1.5);box(.2,2.8,.2,M(0x555555),x-11.3,1.4,sz+1.5);
+    [[-14,0xd33f3f],[-14,0xf2b705],[-14,0x2b9348]].forEach((c,j)=>{
+      box(4,3,4,M(0xe8dcc0),x+c[0]-j*0,1.5,sz+12+j*6);
+      box(4.4,.3,2,M(c[1]),x-14,3,sz+10.5+j*6);
+    });
+    if(i<3){
+      const bz=sz+90;box(11,.16,1.2,M(0xf2b705),cx(bz),.08,bz);bumps.push({z:bz,o:0,w:7,k:2.2,cd:0});
+    }
+  });
+
+  /* bridge with barriers */
+  const bz=-L*.42,bm=M(0xbbbbbb);bridges.push({z0:bz+40,z1:bz-40});
+  const wt=new THREE.Mesh(new THREE.PlaneGeometry(140,30).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:0x2f6f92,roughness:.05,metalness:.15,envMapIntensity:.8}));
+  wt.position.set(cx(bz),0,bz);world.add(wt);
+  for(let k=-4;k<4;k++){
+    [-1,1].forEach(s=>{
+      const z=bz-k*10-5,b=box(.5,.9,10,bm,cx(z)+s*6.2,.45,z);b.rotation.y=-rh(z);
+    });
+  }
+
+  /* potholes */
+  for(let z=-150;z>-L;z-=Math.max(160,L/14)){
+    const o=Math.random()<.5?-3:3;
+    const m=new THREE.Mesh(new THREE.CircleGeometry(.8,10).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0x151515}));
+    m.position.set(cx(z)+o,.06,z);world.add(m);bumps.push({z,o,w:1.2,k:-2,cd:0});
+  }
+
+  /* traffic */
+  const tn=S.mode=="hwy"?q.tr+10:q.tr;
+  for(let i=0;i<tn;i++){
+    const v=mkVeh();v.m.position.y=0;world.add(v.m);traffic.push(v);respawn(v,-rnd(60,600));
+  }
+
+  /* rain */
+  if(!rain){
+    const n2=600,pa=new Float32Array(n2*6);
+    for(let i=0;i<n2;i++)rd.push([rnd(-25,25),rnd(-4,22),rnd(-25,25)]);
+    const g=new THREE.BufferGeometry();
+    g.setAttribute("position",new THREE.BufferAttribute(pa,3));
+    rain=new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:0xaaccee,transparent:true,opacity:.45}));
+    rain.frustumCulled=false;scene.add(rain);
+  }
+}
+
+/* ---------- Detailed Vehicle Models (From v2/v3) ---------- */
+let cl,clm,BWT,TRA,BWM,TRM;
+const TY=M(0x101010,.9),CH=new THREE.MeshStandardMaterial({color:0xdddddd,metalness:1,roughness:.2}),GL=new THREE.MeshStandardMaterial({color:0x0d1a24,roughness:.05,metalness:.9,depthWrite:true,transparent:true,opacity:.85}),LH=new THREE.MeshBasicMaterial({color:0xffffee}),LT=new THREE.MeshBasicMaterial({color:0xaa0000});
+
+function prof(pts,w,mat,bv){
+  const s=new THREE.Shape();
+  pts.forEach((p,i)=>i?s.lineTo(p[0],p[1]):s.moveTo(p[0],p[1]));
+  const dp=w-2*bv,g=new THREE.ExtrudeGeometry(s,{depth:dp,bevelEnabled:true,bevelThickness:bv,bevelSize:bv,bevelSegments:2,curveSegments:6});
+  g.translate(0,0,-dp/2);g.rotateY(Math.PI/2);
+  const m=new THREE.Mesh(g,mat);m.castShadow=true;return m;
+}
+
+function envInit(){
+  if(scene.environment)return;
+  try{
+    const tx=ctex(256,128,(g,w,h)=>{
+      const gr=g.createLinearGradient(0,0,0,h);
+      gr.addColorStop(0,"#6aa8e8");gr.addColorStop(.45,"#dfeaf2");gr.addColorStop(.52,"#7a6f5e");gr.addColorStop(1,"#3a352c");
+      g.fillStyle=gr;g.fillRect(0,0,w,h);
+      // sun disk
+      const r=g.createRadialGradient(w*.6, h*.25, 2, w*.6, h*.25, 40);
+      r.addColorStop(0,"rgba(255,240,200,.9)");r.addColorStop(1,"rgba(255,240,200,0)");
+      g.fillStyle=r;g.fillRect(0,0,w,h);
+    });
+    tx.mapping=THREE.EquirectangularReflectionMapping;
+    const pm=new THREE.PMREMGenerator(renderer);
+    scene.environment=pm.fromEquirectangular(tx).texture;pm.dispose();
+    scene.traverse(o=>{if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>{if(m.envMapIntensity!=null)m.envMapIntensity=0.6});else if(o.material.envMapIntensity!=null)o.material.envMapIntensity=0.6}});
+  }catch(e){}
+}
+
+function wl(g,x,y,z,r,wd){
+  const w=new THREE.Mesh(new THREE.CylinderGeometry(r,r,wd,14).rotateZ(Math.PI/2),TY);
+  w.position.set(x,y,z);w.castShadow=true;g.add(w);
+}
+
+const bwm=()=>BWM||(BWM=new THREE.MeshBasicMaterial({map:ctex(256,64,(c,w,h)=>{
+  c.fillStyle="#0d1a24";c.fillRect(0,0,w,h);
+  for(let i=0;i<8;i++){c.fillStyle="rgba(120,170,200,.4)";c.fillRect(i*32+3,6,26,h-12)}
+  c.fillStyle="#222";for(let i=0;i<=8;i++)c.fillRect(i*32-1,0,3,h);
+})}));
+
+const trm=()=>TRM||(TRM=new THREE.MeshBasicMaterial({map:ctex(256,128,(c,w,h)=>{
+  c.fillStyle="#d32f2f";c.fillRect(0,0,w,h);
+  const cs=["#ffeb3b","#1976d2","#2e7d32","#fff"];
+  for(let i=0;i<6;i++){c.fillStyle=cs[i%4];c.fillRect(0,i*22,w,7)}
+  for(let i=0;i<5;i++){
+    c.fillStyle=cs[(i+1)%4];c.beginPath();c.arc(30+i*48,62,17,0,6.3);c.fill();
+    c.fillStyle="#d32f2f";c.beginPath();c.arc(30+i*48,62,7,0,6.3);c.fill();
+  }
+  c.fillStyle="#111";c.font="bold 22px 'Noto Sans Bengali',sans-serif";c.textAlign="center";c.fillText("আল্লাহ ভরসা",w/2,118);
+})}));
+
+const sp2=(g,m,w,h,x,y,z)=>[-1,1].forEach(s=>{
+  const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),m);p.position.set(s*x,y,z);p.rotation.y=s*Math.PI/2;g.add(p);
+});
+
+function respawn(v,z){
+  for(let t=0;t<6;t++){
+    const on=Math.random()<.45;v.dir=on?1:-1;v.off=on?3:-3;
+    if(v.ed)v.off=on?4.9:-4.9;
+    v.spd=on?rnd(10,17):v.ed?rnd(3,6):rnd(7,11);v.z=z;
+    if(!traffic.some(o=>o!=v&&o.dir==v.dir&&o.off==v.off&&Math.abs(o.z-z)<25))break;
+    z-=30;
+  }
+  v.cs=v.spd;v.hit=0;
+}
+
+function mkVeh(){
+  const k=Math.floor(Math.random()*10),g=new THREE.Group(),c=[0xd33f3f,0x2b6cb0,0xe8b400,0xe8e8e8,0x2b9348,0x8e44ad,0x222222,0xf57c00][Math.floor(Math.random()*8)],pt=new THREE.MeshStandardMaterial({color:c,roughness:.25,metalness:.6,envMapIntensity:.5}),dm=[[1.8,4.4],[2.5,8],[1.4,2.8],[.7,2],[1.1,2.6],[2.6,10],[2.6,10],[1.9,5.2],[1.9,5],[1.9,4.6]][k];
+  const bx=(w,h,d,m,x,y,z)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;g.add(o)},ad=o=>g.add(o),ls=(x,y,z)=>[-x,x].forEach(s=>{bx(.38,.15,.05,LH,s,y,-z);bx(.38,.15,.05,LT,s,y,z)}),ws=(x,y,z,q)=>[-x,x].forEach(s=>wl(g,s,y,z,q,q>.5?.35:.25));
+  if(k==0||k==9){
+    const L=k?2.3:2.2,W=k?1.9:1.8;ad(prof([[-L,.4],[L,.4],[L+.05,.9],[L-.8,1.05],[-L+.9,1.1],[-L,.95]],W,pt,.08));ad(prof(k?[[-1.2,1.05],[-1.1,1.85],[1,1.85],[1.5,1.05]]:[[-1,.95],[-.65,1.55],[.6,1.55],[1,.95]],W-.2,GL,.06));bx(1.4,.05,1.1,pt,0,k?1.9:1.6,0);ls(.6,.75,L+.02);ws(W/2-.1,.36,L-.9,.36);ws(W/2-.1,.36,-L+.9,.36);
+  }else if(k==1){
+    ad(prof([[2,.6],[4,.6],[4,2.4],[3.8,2.8],[2.3,2.8],[2,2.6]],2.4,pt,.1));bx(2,.9,.05,GL,0,2,-4.05);bx(2.5,2.2,5.6,M(0x7a4a1f,.8),0,2,1.1);sp2(g,trm(),5.4,1.8,1.27,2,1.1);bx(2.2,.3,7.6,TY,0,.75,0);bx(2.6,.5,.3,CH,0,.7,-4.1);ls(.8,1,4.02);ws(1.2,.55,-2.8,.55);ws(1.2,.55,2.2,.55);ws(1.2,.55,3.2,.55);
+  }else if(k==2){
+    ad(prof([[-1.4,.4],[1.3,.4],[1.4,.9],[.9,1.3],[.9,1.8],[-1.2,1.8],[-1.4,1.5]],1.3,M(0x1f9d55,.4,.2),.07));bx(1.2,.7,.05,GL,0,1.45,-.92);bx(1.4,.06,2.2,TY,0,1.86,.1);bx(.3,.15,.05,LH,0,.8,-1.46);wl(g,0,.3,-1,.3,.2);ws(.65,.3,.9,.3);
+  }else if(k==3){
+    bx(.15,.5,1.2,pt,0,.7,0);bx(.3,.3,.6,pt,0,1,-.2);bx(.6,.05,.05,CH,0,1.2,-.5);bx(.4,.7,.3,M(0x335577),0,1.35,.15);const h=new THREE.Mesh(new THREE.SphereGeometry(.17,8,6),pt);h.position.set(0,1.88,.05);g.add(h);bx(.12,.1,.05,LH,0,1,-.62);wl(g,0,.33,-.75,.33,.12);wl(g,0,.33,.75,.33,.12);
+  }else if(k==4){
+    const hd=new THREE.Mesh(new THREE.CylinderGeometry(.6,.6,1.3,10,1,true,Math.PI/2,Math.PI).rotateX(Math.PI/2),new THREE.MeshStandardMaterial({color:c,side:THREE.DoubleSide,roughness:.5}));hd.position.set(0,1,.55);g.add(hd);bx(.95,.15,1.3,M(0xc62828),0,.65,.55);bx(.35,.6,.25,M(0x445566),0,1.15,-.55);const h=new THREE.Mesh(new THREE.SphereGeometry(.15,8,6),M(0xc9a27a));h.position.set(0,1.6,-.55);g.add(h);wl(g,0,.35,-1,.35,.08);ws(.5,.35,.7,.35);
+  }else if(k==5||k==6){
+    const dd=k==6,H=dd?5:3.4;ad(prof([[-5,.5],[5,.5],[5.1,1.2],[5,H-1],[4.7,H],[-5,H]],2.6,dd?M(0xc62828,.4,.3):pt,.1));sp2(g,bwm(),8.4,.9,1.31,2.1,.2);if(dd){sp2(g,bwm(),8.4,.9,1.31,3.9,.2);bx(2.3,1,.05,GL,0,4,-5.12);bx(2.66,.2,10,M(0xeeeeee),0,3.05,0)}else{bx(2.66,.22,10,M(0xf2b705),0,1.3,0);bx(2.66,.16,10,M(0x2b9348),0,1,0);bx(1.6,.3,.05,new THREE.MeshBasicMaterial({color:0xffb300}),0,3.1,-5.14)}bx(2.3,1.1,.05,GL,0,2.2,-5.12);bx(2.7,.3,.3,TY,0,.8,-5.2);ls(.9,1,5.12);ws(1.2,.55,-3.5,.55);ws(1.2,.55,3.2,.55);
+  }else if(k==7){
+    ad(prof([[-2.6,.4],[2.6,.4],[2.7,1],[2.5,1.5],[1.9,2.1],[-2.6,2.2]],1.9,new THREE.MeshStandardMaterial({color:[0xf5f5f5,0xffd600][c%2],roughness:.3,metalness:.5}),.08));sp2(g,bwm(),4.2,.7,.97,1.6,-.1);const w=new THREE.Mesh(new THREE.BoxGeometry(1.7,.8,.05),GL);w.position.set(0,1.65,-2.6);w.rotation.x=.5;g.add(w);ls(.7,.8,2.72);ws(.95,.38,-1.7,.38);ws(.95,.38,1.6,.38);
+  }else{
+    ad(prof([[0,.5],[2.5,.5],[2.5,1.3],[1.9,1.4],[1.4,2.1],[0,2.1]],1.8,pt,.08));bx(1.5,.6,.05,GL,0,1.75,-1.7);bx(1.8,.1,2.5,pt,0,.7,1.25);[-.9,.9].forEach(s=>bx(.08,.5,2.5,pt,s,1,1.25));bx(1.8,.5,.08,pt,0,1,2.5);ls(.65,.8,2.52);ws(.9,.38,-1.6,.38);ws(.9,.38,1.7,.38);
+  }
+  return{m:g,w:dm[0],l:dm[1],k,ed:k==3||k==4,dir:-1,off:-3,spd:8,cs:8,z:0,hit:0};
+}
+
+/* ---------- Master Bus (With Non-Shuttering Livery) ---------- */
+function mkBus(){
+  envInit();
+  if(busG){scene.remove(busG);busG.traverse(o=>{if(o.geometry)o.geometry.dispose()})}
+  const g=new THREE.Group();body=new THREE.Group();g.add(body);
+  const col=B[S.bus].c,nm=B[S.bus].n,bnm=["পদ্মা এক্সপ্রেস","মেঘনা কোচ","যমুনা ডিলাক্স"][S.bus];
+  const paint=new THREE.MeshStandardMaterial({color:col,roughness:.25,metalness:.55,envMapIntensity:1.1});
+  const gl=new THREE.MeshStandardMaterial({color:0x0d1a24,roughness:.05,metalness:.9,transparent:true,opacity:.72,depthWrite:true});
+  const dk=M(0x15171a,.8);
+
+  body.add(prof([[-5.5,.55],[5.5,.55],[5.6,1.1],[5.45,2],[4.75,3.4],[4.4,3.52],[-5.2,3.52],[-5.5,3.3]],2.6,paint,.12));
+  box(2.4,.3,10.6,dk,0,.65,0,body);box(2.4,.05,10.8,M(0x333333),0,1.02,0,body);
+
+  const pm=new THREE.InstancedMesh(new THREE.BoxGeometry(.05,.95,.78),gl,18),d=new THREE.Object3D();
+  for(let i=0;i<9;i++){
+    [-1,1].forEach((s,j)=>{
+      d.position.set(s*1.33,2.55,-3.4+i*.9);d.updateMatrix();pm.setMatrixAt(i*2+j,d.matrix);
+    });
+  }
+  body.add(pm);
+  box(2.2,.9,.05,gl,0,2.5,5.64,body);
+  const ws=box(2.3,1.6,.05,gl,0,2.65,-5.1,body);ws.rotation.x=.38;
+
+  // Solid Non-Shuttering Livery Canvas Texture
+  const lt=ctex(512,128,(c,w,h)=>{
+    c.fillStyle="#fff";c.beginPath();c.moveTo(0,50);c.bezierCurveTo(150,10,350,90,w,40);c.lineTo(w,h);c.lineTo(0,h);c.fill();
+    c.fillStyle="#f2b705";c.beginPath();c.moveTo(0,76);c.bezierCurveTo(150,50,350,100,w,70);c.lineTo(w,h);c.lineTo(0,h);c.fill();
+    c.fillStyle="#111";c.textAlign="center";c.font="bold 24px 'Noto Sans Bengali',sans-serif";c.fillText(bnm+" · "+nm,w/2,36);
+  });
+  const lm=decal(lt);
+  [-1,1].forEach(s=>{
+    const p=new THREE.Mesh(new THREE.PlaneGeometry(7.4,1.4),lm);
+    p.position.set(s*1.306,1.45,.4);p.rotation.y=s*Math.PI/2;p.renderOrder=2;body.add(p);
+  });
+
+  box(1.5,.55,.08,dk,0,1.3,-5.68,body);for(let i=0;i<5;i++)box(1.45,.04,.05,CH,0,1.1+i*.1,-5.74,body);box(2.7,.28,.3,CH,0,.8,-5.7,body);box(2.7,.28,.3,CH,0,.8,5.7,body);
+  hlM=new THREE.MeshStandardMaterial({color:0xffffee,emissive:0xffeeaa,emissiveIntensity:.1});tlM=new THREE.MeshStandardMaterial({color:0x660000,emissive:0xff0000,emissiveIntensity:.5});
+  [-1,1].forEach(s=>{
+    box(.62,.42,.08,dk,s*1,1.3,-5.69,body);box(.48,.28,.1,hlM,s*1,1.3,-5.72,body);box(.28,.62,.1,tlM,s*1.1,1.5,5.69,body);box(.5,.05,.05,dk,s*1.55,2.6,-4.5,body);box(.08,.55,.3,dk,s*1.8,2.45,-4.5,body);
+  });
+  indM.l=new THREE.MeshBasicMaterial({color:0x553300});indM.r=indM.l.clone();
+  [[-1.25,indM.l],[1.25,indM.r]].forEach(([x,m])=>{box(.22,.18,.1,m,x,.98,-5.76,body);box(.22,.18,.1,m,x,.98,5.76,body)});
+
+  const pl=new THREE.MeshBasicMaterial({map:ctex(128,40,(c,w,h)=>{c.fillStyle="#fff";c.fillRect(0,0,w,h);c.fillStyle="#111";c.font="bold 15px 'Noto Sans Bengali',sans-serif";c.textAlign="center";c.fillText("ঢাকা মেট্রো ব ১১-৫৫৫৫",w/2,26)})});
+  [[-5.86,Math.PI],[5.86,0]].forEach(([z,r])=>{const p=new THREE.Mesh(new THREE.PlaneGeometry(.9,.28),pl);p.position.set(0,.8,z);p.rotation.y=r;body.add(p)});
+
+  const rCurr=MAP_ROUTES[S.route]||MAP_ROUTES[0];
+  const dm=new THREE.Mesh(new THREE.PlaneGeometry(2,.4),new THREE.MeshBasicMaterial({map:ctex(256,64,(c,w,h)=>{
+    c.fillStyle="#111";c.fillRect(0,0,w,h);c.fillStyle="#ffb300";c.font="bold 34px 'Noto Sans Bengali',sans-serif";c.textAlign="center";
+    c.fillText(rCurr.n[1].split("–")[1]||rCurr.dest,w/2,42);
+  })}));
+  dm.position.set(0,3.27,-4.94);dm.rotation.set(.38,Math.PI,0);body.add(dm);
+
+  box(1.8,.35,3,M(0xeeeeee,.4),0,3.7,1.5,body);box(1.4,.08,1,M(0xcccccc,.4),0,3.6,-2,body);
+  const sm=M(0x2b4a7a,.8),bs=new THREE.InstancedMesh(new THREE.BoxGeometry(.5,.4,.5),sm,40),br=new THREE.InstancedMesh(new THREE.BoxGeometry(.5,.9,.14),sm,40);
+  for(let i=0;i<40;i++){const x=[-.9,-.35,.35,.9][i%4],z=-3.3+Math.floor(i/4)*.85;d.position.set(x,1.25,z);d.updateMatrix();bs.setMatrixAt(i,d.matrix);d.position.set(x,1.9,z+.22);d.updateMatrix();br.setMatrixAt(i,d.matrix)}
+  body.add(bs,br);
+
+  const tg=new THREE.CylinderGeometry(.58,.58,.38,18).rotateZ(Math.PI/2),rg=new THREE.CylinderGeometry(.34,.34,.4,12).rotateZ(Math.PI/2),ag=new THREE.CylinderGeometry(.74,.74,.05,16).rotateZ(Math.PI/2);
+  wF=[];wR=[];
+  [[-1.28,-3.6],[1.28,-3.6],[-1.28,3.2],[1.28,3.2]].forEach(([x,z],i)=>{
+    const pv=new THREE.Group();pv.position.set(x,.58,z);g.add(pv);
+    const w=new THREE.Mesh(tg,TY);w.castShadow=true;w.add(new THREE.Mesh(rg,CH));pv.add(w);
+    const ar=new THREE.Mesh(ag,dk);ar.position.set(x,.58,z);ar.position.x=x*1.03;g.add(ar);
+    i<2?wF.push({pv,w}):wR.push({pv,w});
+  });
+
+  box(2.3,.5,.6,M(0x222222),0,1.95,-5.0,body);
+  swh=new THREE.Group();swh.position.set(.7,2.25,-4.5);swh.rotation.x=-1;body.add(swh);
+  const tr=new THREE.Mesh(new THREE.TorusGeometry(.22,.035,6,14),M(0x111111));tr.add(new THREE.Mesh(new THREE.BoxGeometry(.4,.03,.03),TY));
+  swh.add(tr);swh.userData.t=tr;
+
+  spot=new THREE.SpotLight(0xfff2cc,0,80,.55,.5);spot.position.set(0,1.4,-5.4);spot.target.position.set(0,0,-40);g.add(spot,spot.target);
+
+  if(!cl){
+    clm=new THREE.MeshBasicMaterial({map:ctex(128,128,(c,w,h)=>{const r=c.createRadialGradient(64,64,4,64,64,62);r.addColorStop(0,"rgba(255,255,255,.9)");r.addColorStop(1,"rgba(255,255,255,0)");c.fillStyle=r;c.fillRect(0,0,w,h)}),transparent:true,depthWrite:false,fog:false});
+    cl=new THREE.Group();
+    for(let i=0;i<22;i++){const m=new THREE.Mesh(new THREE.PlaneGeometry(rnd(120,260),rnd(70,130)).rotateX(Math.PI/2),clm);m.position.set(rnd(-600,600),rnd(120,200),rnd(-600,600));cl.add(m)}
+    scene.add(cl);
+  }
+
+  busG=g;scene.add(g);
+}
+
+/* ---------- Quality & Init ---------- */
+function applyQ(){
+  const q=Q[S.q];renderer.setPixelRatio(Math.min(devicePixelRatio||1,q.pr));
+  renderer.shadowMap.enabled=q.sh>0;
+  sun.castShadow=q.sh>0;
+  if(q.sh>0){
+    sun.shadow.mapSize.set(q.sh==2?1024:512,q.sh==2?1024:512);
+    sun.shadow.bias=-0.0003;
+    sun.shadow.normalBias=0.02;
+    sun.shadow.radius=q.sh==2?2.5:1.5;
+    sun.shadow.camera.near=1;
+  const sd=[120,200,260][S.sunDist||1];
+  sun.shadow.camera.far=sd;
+  sun.shadow.camera.updateProjectionMatrix();
+    spot.castShadow=false;
+  }else{
+    spot.castShadow=false;
+  }
+  scene.traverse(o=>{if(o.material)o.material.needsUpdate=true});
+}
+function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
+
+function init(){
+  renderer=new THREE.WebGLRenderer({canvas:$("c"),antialias:S.q!=="low",preserveDrawingBuffer:false});
+  renderer.outputEncoding=THREE.sRGBEncoding;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.05;
+  renderer.physicallyCorrectLights=true;
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.shadowMap.autoUpdate=true;
+  scene=new THREE.Scene();cam=new THREE.PerspectiveCamera(62,1,.5,900);
+  scene.fog=new THREE.FogExp2(0x9ccbe8,.004);
+  hemi=new THREE.HemisphereLight(0xcfe8ff,0x4a6b34,.8);sun=new THREE.DirectionalLight(0xfff0d0,1);
+  ambient=new THREE.AmbientLight(0xffffff,.18);
+  fill=new THREE.DirectionalLight(0x88aaff,.25);fill.position.set(-40,30,-20);
+  const sc=sun.shadow.camera;sc.left=sc.bottom=-90;sc.right=sc.top=90;sc.near=1;sc.far=260;sc.updateProjectionMatrix();
+  scene.add(hemi,sun,sun.target,ambient,fill);
+  // sun disk glow
+  const sdt=ctex(64,64,(g,w,h)=>{const r=g.createRadialGradient(32,32,2,32,32,28);r.addColorStop(0,"rgba(255,245,210,1)");r.addColorStop(.25,"rgba(255,200,120,.7)");r.addColorStop(1,"rgba(255,180,80,0)");g.fillStyle=r;g.fillRect(0,0,w,h)});
+  const sm=new THREE.SpriteMaterial({map:sdt,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+  sunDisk=new THREE.Sprite(sm);sunDisk.scale.set(18,18,1);scene.add(sunDisk);
+
+  build();mkBus();applyQ();resize();
+  addEventListener("resize",resize);
+  buildUI();setupBangladeshMapUI();
+  $("ld").style.display="none";
+  setTimeout(()=>{$("splash").classList.add("hide");setTimeout(()=>{$("splash").style.display="none"},700)},1200);
+  requestAnimationFrame(loop);
+}
+
+/* ---------- Bangladesh SVG GPS Map UI ---------- */
+function setupBangladeshMapUI(){
+  const mapEl=$("bd-map");
+  mapEl.innerHTML=`<div style="padding:20px;overflow:auto;height:100%;box-sizing:border-box">
+    <h3 style="color:var(--ac);margin:0 0 12px">উপলব্ধ রুট (Available Routes)</h3>
+    <div id="route-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    <h3 style="color:#9ec8b2;margin:20px 0 8px">শীঘ্রই আসছে (Coming Soon)</h3>
+    <div id="coming-soon" style="display:flex;flex-direction:column;gap:6px;color:#777;font-size:13px"></div>
+  </div>`;
+  const list=$("route-list"), soon=$("coming-soon");
+  const avail=[6];
+  avail.forEach(id=>{
+    const r=MAP_ROUTES[id];
+    const btn=document.createElement("button");
+    btn.style.cssText="text-align:left;padding:12px;border-radius:10px;background:rgba(10,143,90,.25);border:1px solid var(--ac);color:#fff;cursor:pointer";
+    btn.innerHTML="<b>"+r.n[1]+"</b><br><span style='font-size:12px;color:#9ec8b2'>"+r.origin+" → "+r.dest+" · "+r.dist+"</span>";
+    btn.onclick=()=>{blip();selectRoute(id)};
+    list.appendChild(btn);
+  });
+  MAP_ROUTES.filter(r=>avail.indexOf(r.id)<0).forEach(r=>{
+    const d=document.createElement("div");
+    d.textContent="🔒 "+r.n[1]+" — Coming Soon";
+    soon.appendChild(d);
+  });
+  if(avail.indexOf(S.route)<0){ S.route=avail[0]; save(); }
+  updateRouteSidebar(S.route);
+}
+
+
+function selectRoute(routeId){
+  document.querySelectorAll(".map-node").forEach(n=>n.classList.remove("active"));
+  MAP_ROUTES.forEach(item=>{
+    const l=$("svg-line-"+item.id);
+    if(l){l.setAttribute("stroke","rgba(10,143,90,0.5)");l.setAttribute("stroke-width","1.8");l.setAttribute("stroke-dasharray","2 2")}
+  });
+  const targetNode=$("r-node-"+routeId), targetLine=$("svg-line-"+routeId);
+  if(targetNode)targetNode.classList.add("active");
+  if(targetLine){targetLine.setAttribute("stroke","#f2b705");targetLine.setAttribute("stroke-width","3.5");targetLine.setAttribute("stroke-dasharray","none")}
+  S.route=routeId;save();updateRouteSidebar(routeId);
+}
+
+function updateRouteSidebar(routeId){
+  const r=MAP_ROUTES[routeId];
+  $("rs-title").textContent=r.n[1];
+  if(r.locked){
+    $("rs-status").innerHTML="স্ট্যাটাস: <b style='color:#ff5252'>🔒 লকড (লেভেল "+nb(r.reqLvl)+" বা ৳"+nb(r.reqMoney)+" প্রয়োজন)</b>";
+    $("btn-confirm-route").disabled=true;$("btn-confirm-route").style.opacity="0.5";
+    $("btn-confirm-route").textContent="রুটটি লক করা আছে";
+  }else{
+    $("rs-status").innerHTML="স্ট্যাটাস: <b style='color:#2ecc71'>✓ আনলকড (Ready to drive)</b>";
+    $("btn-confirm-route").disabled=false;$("btn-confirm-route").style.opacity="1.0";
+    $("btn-confirm-route").textContent="যাত্রা শুরু করুন (Depart) ➔";
+  }
+  $("rs-info").innerHTML=`
+    🛣️ <b>রুট:</b> ${r.origin} ➔ ${r.dest}<br>
+    📏 <b>দূরত্ব:</b> ${r.dist}<br>
+    ⏱️ <b>আনুমানিক সময়:</b> ${r.time}<br>
+    💰 <b>ভাড়া উপার্জন:</b> ৳${nb(r.fare)}<br>
+    🌉 <b>হাইওয়ে তথ্য:</b> ${r.desc}
+  `;
+}
+
+/* ---------- Gameplay Loops ---------- */
+function startGame(){
+  audioInit();if(AC&&AC.state=="suspended")AC.resume();
+  applyQ();build();mkBus();
+  const r=MAP_ROUTES[S.route]||MAP_ROUTES[0],m=S.mode;
+  Object.assign(P,{x:-3,z:0,h:0,v:0,steer:0,rpm:800,sy:0,sv:0,roll:0,pitch:0,fuel:100,thr:0,eng:true,gear:1,tod:m=="hwy"?.4:.12,acc:0,airPressure:100});
+  lights=false;ind=0;
+  G={state:"play",t:0,earn:0,pax:m=="career"||m=="time"?Math.floor(rnd(18,34)):0,col:0,cd:0,dwell:0,idx:0,spdT:0,mt:0,msg:"",len:r.len,mode:m,limit:m=="time"?r.len/11+40:m=="park"?90:0,pk:0,spdF:0,fare:r.fare};
+  $("hud").style.display="block";show("");
+  helperSpeak("ওস্তাদ, রুট নিশ্চিত হয়েছে! ইঞ্জিন চালু করে টান দেন!");
+}
+
+function endGame(win,why){
+  if(G.state!="play")return;
+  G.state="end";
+  const m=G.mode;let b=0;
+  if(win){b=m=="career"?G.fare:m=="time"?Math.max(0,G.limit-G.t)*2:m=="park"?400+Math.max(0,G.limit-G.t)*3:m=="hwy"?G.len*.2:0}
+  G.earn=Math.max(0,Math.round(G.earn+b));S.money+=G.earn;
+  if(win&&S.money>4500)S.level=Math.max(S.level,2);
+  if(win&&S.money>9500)S.level=Math.max(S.level,3);
+  save();$("et").textContent=win?t("done"):t("fail");
+  $("eb").innerHTML=(why?why+"<br>":"")+t("earn")+": ৳"+nb(G.earn)+"<br>"+t("col")+": "+nb(G.col)+"<br>"+t("tt")+": "+nb(Math.round(G.t))+"s<br>"+t("bal")+": ৳"+nb(S.money);
+  show("end");$("hud").style.display="none";
+}
+
+function crash(v,lf){
+  if(G.cd>0)return;
+  G.cd=1.1;G.col++;G.earn-=60+Math.abs(P.v)*7;P.v*=.2;P.sv+=3;
+  const s=lf>0?-1:1;P.x+=Math.sin(P.h)*s*.8;P.z-=Math.cos(P.h)*s*.8;
+  v.hit=2;v.cs=0;msg("crash");blip();
+  helperSpeak("গেল গেল ওস্তাদ! সাবধানে চালান!");
+}
+
+function mission(dt){
+  const m=G.mode,r=MAP_ROUTES[S.route]||MAP_ROUTES[0],off=P.x-cx(P.z);
+  if(m=="career"||m=="time"){
+    const sz=stopsZ[G.idx];
+    if(sz!=null){
+      const ok=Math.abs(P.z-sz)<13&&off<-3&&off>-9.5;
+      if(ok&&Math.abs(P.v)<1.3){
+        G.dwell+=dt;msg(0,t("board"));
+        if(G.dwell>3){
+          G.earn+=G.pax*40;const last=G.idx==3;G.pax=last?0:Math.floor(rnd(12,38));
+          P.fuel=Math.min(100,P.fuel+25);G.idx++;G.dwell=0;if(last)return endGame(true);
+        }
+      }else G.dwell=0;
+      if(P.z<sz-30){G.earn-=150;G.idx++;msg("miss");if(G.idx>3)endGame(false,t("miss"))}
+    }
+    if(m=="time"&&G.t>G.limit)endGame(false,t("late"));
+  }
+  if(m=="hwy"){G.earn+=Math.abs(P.v)*dt*.12;if(P.z<-G.len)endGame(true)}
+  if(m=="park"){
+    const dx=P.x-pad.x,dz=P.z-pad.z,c=Math.cos(pad.a),s=Math.sin(pad.a),lx=dx*c+dz*s,lz=-dx*s+dz*c,da=Math.abs(Math.atan2(Math.sin(P.h-pad.a),Math.cos(P.h-pad.a)));
+    if(Math.abs(lx)<1.6&&Math.abs(lz)<1.5&&da<.3&&Math.abs(P.v)<.6){G.pk+=dt;msg(0,t("pkd")+" "+(2-G.pk).toFixed(1));if(G.pk>2)endGame(true)}else G.pk=0;
+    if(G.t>G.limit)endGame(false,t("late"));
+  }
+  if(m!="free"&&m!="park"&&P.fuel<=0&&Math.abs(P.v)<.3)endGame(false,t("fuel"));
+  if(m!="free"&&Math.abs(P.v)*3.6>80){G.spdT+=dt;if(G.spdT>3){G.spdT=0;G.earn-=50;msg("spd")}}else G.spdT=0;
+}
+
+function step(dt){
+  G.t+=dt;G.cd-=dt;blink=(G.t*2.5)%1<.5;
+  const up=K.gas?1:0,dn=K.brake?1:0,gr=P.gear,bus=B[S.bus];
+  if(P.fuel<=0&&P.eng){P.eng=false;msg("fuel")}
+  const on=P.eng;
+
+  P.thr+=(up-P.thr)*Math.min(1,dt*5);
+  const gm=[1,7,13,20,27,34][gr],ratio=Math.abs(P.v)/gm;
+  const rt=!on?0:gr==0?800+P.thr*3500:800+Math.min(1.1,ratio)*5000;
+  P.rpm+=(rt-P.rpm)*Math.min(1,dt*6);
+  const pf=clamp((P.rpm-800)/700+.3,.15,1);
+
+  let a=0;
+  if(on&&gr>0&&up){a+=P.v<-.3?7:[0,5.5,4,3,2.3,1.7][gr]*bus.p*pf*Math.max(0,1-Math.max(0,P.v)/gm)}
+  if(dn&&!up){
+    if(P.v>.4){a-=11;P.airPressure=Math.max(20,P.airPressure-dt*8)}
+    else if(P.v<-.4&&(!on||gr==0))a+=8;
+    else if(on&&gr>0)a-=2.6*clamp(1+P.v/5,0,1);
+  }else{
+    P.airPressure=Math.min(100,P.airPressure+dt*4);
+  }
+
+  const sg=Math.sign(P.v),av=Math.abs(P.v);
+  a-=.015*P.v*av+sg*.35*Math.min(1,av);
+  if(on&&gr>0&&!up&&!dn)a-=sg*.5*Math.min(1,av);
+  if(K.hand)a-=sg*7*Math.min(1,av);
+
+  const rc=cx(P.z),off=P.x-rc;
+  if(Math.abs(off)>7.5)a-=sg*clamp(Math.abs(off)-7.5,0,6)*.9;
+  P.acc=(K.hand||(dn&&P.v>6))?Math.min(1,av/10):0;
+
+  const pv=P.v;P.v+=a*dt;
+  if(pv*P.v<0&&!(dn&&on&&gr>0)&&!(up&&on&&gr>0))P.v=0;
+
+  const mx=.62/(1+Math.abs(P.v)*.14)*S.sens,tg=((K.right?1:0)-(K.left?1:0))*mx;
+  P.steer+=(tg-P.steer)*Math.min(1,dt*(tg?4:7));
+  P.h+=P.v/7*Math.tan(P.steer)*dt;
+  if(K.hand&&av>8)P.h+=P.steer*P.v*.02*dt;
+
+  P.x+=Math.sin(P.h)*P.v*dt;P.z-=Math.cos(P.h)*P.v*dt;
+  P.wr+=P.v/.55*dt;
+  if(on)P.fuel-=dt*(.012+P.thr*.05);
+
+  // simple collision with traffic
+  for(const v of traffic){
+    if(!v||!v.m)continue;
+    const dx=P.x-v.m.position.x, dz=P.z-v.m.position.z;
+    if(Math.hypot(dx,dz)<3.2){ P.v*=0.6; msg("crash"); break; }
+  }
+
+  for(const b of bumps){
+    if(b.cd>0)b.cd-=dt;
+    else if(Math.abs(P.z-b.z)<.8&&Math.abs(P.x-(cx(b.z)+b.o))<b.w){
+      P.sv+=b.k*Math.min(av/10,2);b.cd=1.5;helperSpeak("আস্তে ওস্তাদ, স্পিড ব্রেকার!");
+    }
+  }
+
+  P.sv+=(-70*P.sy-9*P.sv)*dt;P.sy+=P.sv*dt;
+  P.roll+=(P.v*P.steer*.02-P.roll)*Math.min(1,dt*4);
+  P.pitch+=(clamp(a*.004,-.06,.06)-P.pitch)*Math.min(1,dt*4);
+
+  for(const br of bridges)if(P.z<br.z0&&P.z>br.z1&&Math.abs(off)>5){
+    P.x=cx(P.z)+Math.sign(off)*5;P.v*=.7;if(G.cd<=0){G.cd=1;G.col++;G.earn-=80;msg("crash")}
+  }
+
+  const fx=Math.sin(P.h),fz=-Math.cos(P.h),rx=Math.cos(P.h),rz=Math.sin(P.h);
+  for(const v of traffic){
+    if(v.hit>0)v.hit-=dt;
+    else{
+      let tg=v.spd;
+      for(const o of traffic){
+        if(o===v||o.dir!==v.dir||o.off!==v.off)continue;
+        const gp=(o.z-v.z)*v.dir-(v.l+o.l)/2;
+        if(gp>-2&&gp<12)tg=Math.min(tg,gp<4?0:Math.max(0,o.cs));
+      }
+      if(v.dir<0){
+        const gp=(v.z-P.z)-(v.l+11)/2,lat=Math.abs(cx(v.z)+v.off-P.x);
+        if(gp>-2&&gp<14&&lat<(v.w+2.6)/2+.4)tg=Math.min(tg,gp<4?0:Math.abs(P.v));
+      }
+      v.cs+=(tg-v.cs)*Math.min(1,dt*3);v.z+=v.dir*v.cs*dt;
+    }
+    const vx=cx(v.z)+v.off;v.m.position.set(vx,0,v.z);
+    v.m.rotation.y=(v.dir>0?Math.PI:0)-rh(v.z);
+    const dz=v.z-P.z,dx=vx-P.x;
+    if(dz>150){respawn(v,P.z-rnd(300,550));continue}
+    if(Math.abs(dz)>12||Math.abs(dx)>12)continue;
+    const lf=dx*fx+dz*fz,lr=dx*rx+dz*rz;
+    if(Math.abs(lf)<5.5+v.l/2&&Math.abs(lr)<1.3+v.w/2)crash(v,lf);
+  }
+
+  mission(dt);
+}
+
+/* ---------- Rendering & Camera ---------- */
+const sky={n:new THREE.Color(0x050a18),d:new THREE.Color(0x86c0e8),o:new THREE.Color(0xf09a60),g:new THREE.Color(0x707a82),c:new THREE.Color()};
+
+function render(dt,ts){
+  const play=G.state=="play"||G.state=="pause"||G.state=="end";
+  if(G.state=="play")P.tod=(P.tod+dt/180)%1;
+  const sh=Math.sin(P.tod*6.2832),d=clamp(.5+sh*1.6,0,1);
+  wetS+=((S.rain?1:0)-wetS)*Math.min(1,dt);
+
+  sky.c.copy(sky.n).lerp(sky.d,d).lerp(sky.o,(1-Math.abs(d*2-1))*.35).lerp(sky.g,wetS*.5*(.3+d*.7));
+  scene.background=sky.c;scene.fog.color.copy(sky.c);scene.fog.density=.0035+wetS*.004;
+
+  hemi.intensity=.25+d*.75*(1-wetS*.3);sun.intensity=d*1.25*(1-wetS*.5);
+  ambient.intensity=.12+.18*d;
+  fill.intensity=.18*(1-d)+.1;
+  roadMat.roughness=.92-.65*wetS;roadMat.color.setScalar(1-.35*wetS);
+  sun.position.set(P.x+Math.cos(P.tod*6.2832)*70,20+Math.max(sh,.05)*90,P.z+30);sun.target.position.set(P.x,0,P.z);
+  if(sunDisk){sunDisk.position.copy(sun.position);sunDisk.visible=sh>-.05;sunDisk.material.opacity=clamp(sh*2+.2,0,1)}
+
+  busG.position.set(P.x,0,P.z);
+  if(cl){cl.position.set(P.x,0,P.z);clm.opacity=d*.85}
+  busG.rotation.y=-P.h;
+  body.position.y=P.sy;body.rotation.z=P.roll;body.rotation.x=P.pitch;
+
+  wF.forEach(o=>{o.pv.rotation.y=-P.steer;o.w.rotation.x=-P.wr});
+  wR.forEach(o=>o.w.rotation.x=-P.wr);
+  swh.userData.t.rotation.z=-P.steer*3;
+
+  const br=K.brake&&P.v>.3;
+  hlM.emissiveIntensity=lights?2:.1;spot.intensity=lights?1.6:0;
+  tlM.emissiveIntensity=br||K.hand?2.5:.5;
+  indM.l.color.set(ind==-1&&blink?0xffa000:0x553300);
+  indM.r.color.set(ind==1&&blink?0xffa000:0x553300);
+
+  const fx=Math.sin(P.h),fz=-Math.cos(P.h),rx=Math.cos(P.h),rz=Math.sin(P.h),k=1-Math.exp(-dt*5);
+  if(G.state=="menu"||G.state=="garage"||G.state=="map-scr"){
+    if(!isDraggingTurntable) menuOrbitAngle += dt * 0.16;
+    cam.position.set(P.x+Math.cos(menuOrbitAngle)*16.5,4.6,P.z+Math.sin(menuOrbitAngle)*16.5);
+    cam.fov=58;cam.lookAt(P.x,1.8,P.z);
+  }else if(camM==0){
+    cam.fov=62;cam.position.lerp(new THREE.Vector3(P.x-fx*17,6.5,P.z-fz*17),k);
+    cam.lookAt(P.x+fx*8,2.5,P.z+fz*8);
+  }else{
+    cam.fov=75;cam.position.set(P.x+fx*4.3+rx*.7,2.75+P.sy,P.z+fz*4.3+rz*.7);
+    cam.lookAt(P.x+fx*30+rx*.7,2.4,P.z+fz*30+rz*.7);
+  }
+  cam.updateProjectionMatrix();
+
+  rain.visible=wetS>.05;
+  if(rain.visible){
+    const p=rain.geometry.attributes.position.array,nn=S.q=="low"?250:600;
+    rain.geometry.setDrawRange(0,nn*2);
+    for(let i=0;i<nn;i++){
+      const r=rd[i];r[1]-=dt*30;if(r[1]<-3)r[1]=22;
+      p.set([r[0],r[1],r[2],r[0],r[1]+.8,r[2]],i*6);
+    }
+    rain.geometry.attributes.position.needsUpdate=true;rain.position.copy(cam.position);
+  }
+
+  // people walking along roadside
+  people.forEach(p=>{
+    p.position.z -= p.userData.speed*dt;
+    p.position.x = cx(p.position.z) + p.userData.side*p.userData.offset;
+    if(p.position.z < -L+20 || p.position.z > 10){
+      p.position.z = (Math.random()<.5?P.z-20:P.z-60);
+      p.userData.side = Math.random()<.5?-1:1;
+      p.userData.offset = rnd(10,18);
+    }
+  });
+  smoke.forEach(s=>{
+    s.position.y+=s.userData.vy*dt; s.userData.life+=dt;
+    s.material.opacity=Math.max(0,.6-s.userData.life*.2);
+    if(s.userData.life>3){ s.position.y=rnd(2,4); s.userData.life=0; s.position.x=cx(s.position.z)+rnd(-6,6); }
+  });
+  renderer.render(scene,cam);
+  if(play)hudUpdate(dt);
+  audio();
+}
+
+/* ---------- In-game Route Advisor Mini-Map & Speedometer ---------- */
+function updateRouteAdvisor(rem, sp){
+  const el=$("mini-gps");
+  if(!el)return;
+  const ctx=el.getContext("2d"), W=el.width, H=el.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#071622";ctx.fillRect(0,0,W,H);
+
+  ctx.strokeStyle="rgba(255,255,255,0.06)";ctx.lineWidth=1;
+  for(let x=0;x<W;x+=22){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+  for(let y=0;y<H;y+=22){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+
+  const r=MAP_ROUTES[S.route]||MAP_ROUTES[0], busX=W/2, busY=H-26;
+  ctx.save();ctx.translate(busX,busY);ctx.rotate(-P.h);
+
+  ctx.lineWidth=15;ctx.strokeStyle="rgba(10,143,90,0.45)";ctx.beginPath();
+  for(let zOffset=0;zOffset<=260;zOffset+=15){
+    const worldZ=P.z-zOffset, curveX=(cx(worldZ)-P.x)*1.8, mapY=-zOffset*0.42;
+    if(zOffset===0)ctx.moveTo(curveX,mapY);else ctx.lineTo(curveX,mapY);
+  }
+  ctx.stroke();
+
+  ctx.lineWidth=6;ctx.strokeStyle="#f2b705";ctx.beginPath();
+  for(let zOffset=0;zOffset<=260;zOffset+=15){
+    const worldZ=P.z-zOffset, curveX=(cx(worldZ)-P.x)*1.8, mapY=-zOffset*0.42;
+    if(zOffset===0)ctx.moveTo(curveX,mapY);else ctx.lineTo(curveX,mapY);
+  }
+  ctx.stroke();
+
+  const tollDist=r.tollZ-P.z;
+  if(tollDist<0&&tollDist>-260){
+    const tzY=tollDist*0.42, tzX=(cx(r.tollZ)-P.x)*1.8;
+    ctx.fillStyle="#ff3333";ctx.beginPath();ctx.arc(tzX,tzY,5,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle="#ffffff";ctx.lineWidth=1.5;ctx.stroke();
+  }
+  const bDist=r.bridgeZ0-P.z;
+  if(bDist<0&&bDist>-260){
+    const bzY=bDist*0.42, bzX=(cx(r.bridgeZ0)-P.x)*1.8;
+    ctx.fillStyle="#3399ff";ctx.beginPath();ctx.arc(bzX,bzY,5.5,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle="#ffffff";ctx.lineWidth=1.5;ctx.stroke();
+  }
+  ctx.restore();
+
+  ctx.save();ctx.translate(busX,busY);ctx.fillStyle="#ffffff";ctx.strokeStyle="#000000";ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(0,-10);ctx.lineTo(6.5,7);ctx.lineTo(0,3.5);ctx.lineTo(-6.5,7);ctx.closePath();
+  ctx.fill();ctx.stroke();ctx.restore();
+
+  $("ra-dist-rem").textContent=(rem/1000).toFixed(1)+" কিমি";
+  let nextHint="⬆️ সোজা এগিয়ে যান";
+  if(Math.abs(P.z-r.tollZ)<220)nextHint="🛑 টোল প্লাজা সামনে";
+  else if(P.z>r.bridgeZ0&&P.z<r.bridgeZ0+320)nextHint="🌉 সেতু সামনে আসছে";
+  else if(P.z<=r.bridgeZ0&&P.z>=r.bridgeZ1)nextHint="🌉 সেতুর ওপর আছেন";
+  else if(rem<450)nextHint="🏁 গন্তব্য সন্নিকটে";
+  $("ra-turn-hint").textContent=nextHint;
+  $("ra-spd-limit").textContent=(sp>80?"⚠️ ":"🚸 ")+"৮০ কিমি";
+  $("ra-spd-limit").style.color=sp>80?"#ff5252":"#9eccd8";
+}
+
+function speedo(sp){
+  const g=$("spd").getContext("2d"),X=110,Y=86,a0=.8*Math.PI,sw=1.4*Math.PI;
+  g.clearRect(0,0,220,160);g.lineCap="round";
+  const arc=(r,f,col,lw)=>{
+    g.lineWidth=lw;g.strokeStyle=col;g.beginPath();g.arc(X,Y,r,a0,a0+sw*clamp(f,.001,1));g.stroke();
+  };
+  g.fillStyle="rgba(8,20,16,.6)";g.beginPath();g.arc(X,Y,64,0,6.3);g.fill();
+  arc(72,1,"rgba(255,255,255,.18)",9);const f=sp/140;arc(72,f,f>.8?"#ff5252":"#f2b705",9);
+  arc(82,1,"rgba(255,255,255,.1)",4);arc(82,(P.rpm-800)/5700,P.rpm>5800?"#ff5252":"#4dd0e1",4);
+
+  g.fillStyle="#fff";g.textAlign="center";g.font="bold 44px system-ui";
+  g.fillText(Math.round(sp),X,Y+10);g.font="12px system-ui";g.fillText("km/h",X,Y+28);
+  g.font="bold 20px system-ui";g.fillStyle="#f2b705";g.fillText(P.gear==0?"N":P.v<-.3?"R":P.gear,X,Y-34);
+
+  g.fillStyle="#1e4a38";g.fillRect(60,148,100,7);
+  g.fillStyle=P.fuel<15?"#ff5252":"#2ecc71";g.fillRect(60,148,P.fuel,7);
+  g.font="18px system-ui";g.fillStyle=ind==-1&&blink?"#ffa000":"#555";g.fillText("◀",18,60);
+  g.fillStyle=ind==1&&blink?"#ffa000":"#555";g.fillText("▶",202,60);
+  g.fillStyle=lights?"#fff27a":"#555";g.fillText("☀",18,110);
+  g.fillStyle=P.eng?"#2ecc71":"#ff5252";g.fillText("●",202,110);
+}
+
+function hudUpdate(dt){
+  if(G.mt>0){G.mt-=dt;$("toast").textContent=G.mt>0?G.msg:""}
+  const r=MAP_ROUTES[S.route]||MAP_ROUTES[0],i=li(),m=G.mode,sp=Math.abs(P.v)*3.6;
+  let nxt,rem=Math.max(0,G.len+P.z);
+  if((m=="career"||m=="time")&&stopsZ[G.idx]!=null){nxt=r.st[G.idx]?r.st[G.idx][i]:r.dest;rem=Math.abs(P.z-stopsZ[G.idx])}
+  else nxt=m=="park"?t("pk"):m=="free"?r.n[i]:r.dest;
+
+  const eta=rem/Math.max(8,Math.abs(P.v)),mm=s=>nb(Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0"));
+  $("a1").innerHTML="৳ "+nb(Math.round(S.money+G.earn))+" &nbsp; 👥 "+nb(G.pax);
+  $("a3").textContent=t("next")+": "+nxt;
+  $("a4").textContent=m=="park"?"":nb((rem/1000).toFixed(2))+" km · "+t("eta")+" "+mm(eta)+(G.limit?" · ⏱ "+mm(Math.max(0,G.limit-G.t)):"");
+  $("a5").style.width=clamp(-P.z/G.len*100,0,100)+"%";
+  speedo(sp);
+  updateRouteAdvisor(rem,sp);
+}
+
+let last=0;
+function loop(ts){
+  requestAnimationFrame(loop);
+  const dt=Math.min(.05,(ts-last)/1000||0);last=ts;
+  if(G.state=="play")step(dt);
+  render(G.state=="play"?dt:0,ts);
+}
+
+/* ---------- User Input & UI Setup ---------- */
+const tog={
+  cam:()=>camM^=1,
+  light:()=>lights=!lights,
+  gear:()=>{P.gear=Math.min(5,P.gear+1);playAirBrakePshhh();blip()},
+  gearD:()=>{P.gear=Math.max(0,P.gear-1);playAirBrakePshhh();blip()},
+  eng:()=>{if(P.fuel>0)P.eng=!P.eng},
+  indL:()=>ind=ind==-1?0:-1,
+  indR:()=>ind=ind==1?0:1
+};
+const km={
+  KeyW:"gas",ArrowUp:"gas",KeyS:"brake",ArrowDown:"brake",
+  KeyA:"left",ArrowLeft:"left",KeyD:"right",ArrowRight:"right",
+  Space:"hand",KeyH:"horn",KeyC:"cam",KeyL:"light",
+  KeyQ:"indL",KeyE:"indR",KeyG:"gear",KeyF:"gearD",KeyI:"eng"
+};
+
+function press(k){
+  if(!K[k]&&tog[k]&&G.state=="play")tog[k]();
+  K[k]=1;
+}
+
+addEventListener("keydown",e=>{
+  if(e.code=="Escape"){if(!e.repeat)togglePause();return}
+  const k=km[e.code];if(!k)return;
+  e.preventDefault();press(k);
+});
+addEventListener("keyup",e=>{
+  const k=km[e.code];if(k){
+    if(k=="brake"&&P.v>1)playAirBrakePshhh();
+    K[k]=0;
+  }
+});
+addEventListener("blur",()=>{for(const k in K)K[k]=0;if(G.state=="play")togglePause()});
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&G.state=="play")togglePause()});
+
+function togglePause(){
+  if(G.state=="play"){G.state="pause";for(const k in K)K[k]=0;show("pause")}
+  else if(G.state=="pause"){G.state="play";show("")}
+}
+
+function group(id,items,cur,fn){
+  const el=$(id);el.innerHTML="";
+  items.forEach(([v,l])=>{
+    const b=document.createElement("button");b.textContent=l;if(v==cur)b.className="sel";
+    b.onclick=()=>{fn(v);save();buildUI()};el.appendChild(b);
+  });
+}
+
+// Interactive 360 Turntable Drag in Menu
+addEventListener("pointerdown",e=>{
+  if(G.state=="menu"||G.state=="garage"){isDraggingTurntable=true;lastPointerX=e.clientX}
+});
+addEventListener("pointermove",e=>{
+  if(isDraggingTurntable){
+    const delta=e.clientX-lastPointerX;menuOrbitAngle-=delta*0.008;lastPointerX=e.clientX;
+  }
+});
+addEventListener("pointerup",()=>isDraggingTurntable=false);
+addEventListener("pointercancel",()=>isDraggingTurntable=false);
+
+function updateHubUI(){
+  const bus=B[S.bus];
+  $("hub-driver-rank").textContent="⭐ লেভেল "+nb(S.level)+" · হাইওয়ে মাস্টার";
+  $("hub-wallet").textContent="💰 ৳"+nb(Math.round(S.money));
+  $("hub-btn-mute").textContent=S.mute?"🔇":"🔊";
+  $("hub-btn-rain").textContent=S.rain?"🌧️":"☀️";
+  $("hub-bus-name").textContent=bus.n;
+  $("hub-bus-desc").textContent=bus.desc||"";
+  $("hub-spec-hp").textContent=bus.hp||"260 HP";
+  $("hub-spec-spd").textContent=bus.spd||"120 km/h";
+  $("hub-spec-brk").textContent=bus.brk||"Air 95%";
+}
+
+function buildUI(){
+  document.querySelectorAll("[data-i]").forEach(e=>e.textContent=t(e.dataset.i));
+  document.documentElement.lang=S.lang=="bn"?"bn":"en";
+  group("gb",B.map((b,i)=>[i,b.n.split("(")[0]]),S.bus,v=>{S.bus=v;save();mkBus();buildUI()});
+  group("sq",["low","med","high"].map(k=>[k,t(k)]),S.q,v=>S.q=v);
+  group("ssd",[0,1,2].map(k=>[k,["Low","Med","High"][k]]),S.sunDist,v=>{S.sunDist=v;save();applyQ()});
+  updateHubUI();
+  $("sl").textContent=t("lang");$("sr").textContent=t("rain")+(S.rain?" ✓":"");
+  $("sm").textContent=t("mute")+(S.mute?" ✓":"");$("sv").value=S.vol;$("ss").value=S.sens;
+}
+
+$("btn-open-map").onclick=()=>{blip();show("map-scr");setupBangladeshMapUI()};
+$("btn-close-map").onclick=()=>{blip();show("menu");updateHubUI()};
+$("btn-confirm-route").onclick=()=>{blip();startGame()};
+$("btn-open-garage").onclick=()=>{blip();show("garage-scr")};
+$("btn-garage-back").onclick=()=>{blip();show("menu");updateHubUI()};
+$("btn-garage-drive").onclick=()=>{blip();startGame()};
+$("btn-free-drive").onclick=()=>{blip();S.mode="free";startGame()};
+
+$("hub-btn-mute").onclick=()=>{S.mute=!S.mute;save();updateHubUI()};
+$("hub-btn-rain").onclick=()=>{S.rain=!S.rain;save();updateHubUI()};
+
+$("ms").onclick=()=>{blip();prev="menu";show("set")};
+$("ps").onclick=()=>{blip();prev="pause";show("set")};
+$("sb").onclick=()=>{blip();show(prev);updateHubUI()};
+$("sl").onclick=()=>{S.lang=S.lang=="en"?"bn":"en";save();buildUI()};
+$("sr").onclick=()=>{S.rain=!S.rain;save();buildUI()};
+$("sm").onclick=()=>{S.mute=!S.mute;save();buildUI()};
+$("sv").oninput=e=>{S.vol=+e.target.value;save()};
+$("ss").oninput=e=>{S.sens=+e.target.value;save()};
+$("bp")&&($("bp").onclick=togglePause);
+$("pr").onclick=togglePause;$("pt").onclick=startGame;$("er").onclick=startGame;
+const toMenu=()=>{G.state="menu";$("hud").style.display="none";buildUI();show("menu")};
+$("pm").onclick=toMenu;$("em").onclick=toMenu;
+
+/* Touch Controls & Virtual Gamepad Setup */
+(function setupHUDAndTouch(){
+  const r=document.createElement("div");r.id="rot";r.textContent="↻ Rotate your phone to landscape · ফোন আড়াআড়ি ঘোরান";document.body.appendChild(r);
+  const bind=(b,k)=>{
+    b.addEventListener("pointerdown",e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId)}catch(x){}press(k);b.classList.add("dn")});
+    ["pointerup","pointercancel","lostpointercapture"].forEach(ev=>b.addEventListener(ev,()=>{
+      if(k=="brake"&&P.v>1)playAirBrakePshhh();
+      K[k]=0;b.classList.remove("dn");
+    }));
+  };
+  [["","⏸"],["cam","📷"],["light","💡"],["eng","⚙"],["indL","◁"],["indR","▷"]].forEach(([k,l])=>{
+    const b=document.createElement("button");b.className="tb2";b.textContent=l;
+    k?bind(b,k):b.onclick=togglePause;$("a6").appendChild(b);
+  });
+  [
+    ["left","◀","left:14px;bottom:14px;width:84px;height:84px",""],
+    ["right","▶","left:108px;bottom:14px;width:84px;height:84px",""],
+    ["brake","BRAKE","right:104px;bottom:14px;width:84px;height:100px","pd br"],
+    ["gas","GAS","right:14px;bottom:14px;width:84px;height:130px","pd gs"],
+    ["horn","🔊","right:14px;bottom:152px;width:50px;height:50px",""],
+    ["hand","P","right:70px;bottom:152px;width:50px;height:50px",""],
+    ["gear","G▲","right:126px;bottom:152px;width:50px;height:50px",""],
+    ["gearD","G▼","right:182px;bottom:152px;width:50px;height:50px",""]
+  ].forEach(([k,l,st,cl2])=>{
+    const b=document.createElement("button");b.className="tk "+cl2;b.textContent=l;b.style.cssText=st;bind(b,k);$("tc2").appendChild(b);
+  });
+  if(TOUCH){
+    $("tc2").style.display="block";
+    $("st")&&$("st").addEventListener("click",()=>{
+      try{
+        const e=document.documentElement;
+        (e.requestFullscreen?e.requestFullscreen():Promise.reject()).then(()=>screen.orientation.lock("landscape")).catch(()=>{});
+      }catch(x){}
+    });
+  }
+})();
+
+/* Initial Launch */
+if(typeof THREE=="undefined"){
+  $("ld").textContent="Could not load Three.js. Check your connection.";
+}else{
+  const bn="ঢাকা পদ্মা মেঘনা যমুনা ০১২৩৪৫৬৭৮৯ কিমি আল্লাহ ভরসা",
+  fl=document.fonts&&document.fonts.load?Promise.all([
+    "bold 30px 'Noto Sans Bengali'","bold 24px 'Noto Sans Bengali'","20px 'Noto Sans Bengali'","16px 'Hind Siliguri'","600 13px 'Hind Siliguri'"
+  ].map(f=>document.fonts.load(f,bn))).catch(()=>{}):Promise.resolve();
+  Promise.race([fl,new Promise(r=>setTimeout(r,2500))]).then(()=>init());
+}
+</script>
+</body>
+</html>
