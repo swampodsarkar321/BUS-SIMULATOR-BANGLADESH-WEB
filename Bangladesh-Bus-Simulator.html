@@ -766,11 +766,8 @@ function build(){
     s.userData={vy:rnd(.5,1.2),life:rnd(0,2)}; smoke.push(s); scene.add(s);
   }
 
-  /* fuel station */
-  box(8,3,5,M(0xd32f2f,.4), cx(-L*.35)+8,1.5,-L*.35);
-  box(1.2,2.5,.6,M(0xffffff,.3), cx(-L*.35)+4,1.25,-L*.35-2);
-  box(1.2,2.5,.6,M(0xffffff,.3), cx(-L*.35)+8,1.25,-L*.35-2);
-  box(1.2,2.5,.6,M(0xffffff,.3), cx(-L*.35)+12,1.25,-L*.35-2);
+  /* detailed fuel station (Aftab) */
+  mkAftabFuelStation(cx(-L*0.35)+12, -L*0.35);
 
   /* people sprites (Bengali clothing) */
   const peopleTex=ctex(64,128,(c,w,h)=>{
@@ -1287,6 +1284,52 @@ function mkDimlaPoliceStation(x,z){
   });
   const signMat=new THREE.MeshStandardMaterial({map:signTex,roughness:.6});
   const sign=new THREE.Mesh(new THREE.PlaneGeometry(14,4),signMat); sign.position.set(0,11,.02); g.add(sign);
+  landmarks.push({x:x,z:z});
+  g.rotation.y=-rh(z);
+  g.position.set(x,0,z); world.add(g);
+}
+
+function mkAftabFuelStation(x,z){
+  const g=new THREE.Group();
+  const tileBlue=new THREE.MeshStandardMaterial({color:0x1e3a8a,roughness:.7});
+  const white=new THREE.MeshStandardMaterial({color:0xe0e0e0,roughness:.8});
+  const red=new THREE.MeshStandardMaterial({color:0xc62828,roughness:.7});
+  const pillarBlue=new THREE.MeshStandardMaterial({color:0x283593,roughness:.8});
+  const darkHose=new THREE.MeshStandardMaterial({color:0x222222,roughness:.9});
+  // island
+  const island=new THREE.Mesh(new THREE.BoxGeometry(16,.6,4),tileBlue); island.position.set(0,.3,0); island.castShadow=true; island.receiveShadow=true; g.add(island);
+  // pillars
+  const pGeo=new THREE.BoxGeometry(1.2,9,1.2);
+  const lp=new THREE.Mesh(pGeo,pillarBlue); lp.position.set(-7,4.5,0); lp.castShadow=true; g.add(lp);
+  const rp=new THREE.Mesh(pGeo,pillarBlue); rp.position.set(7,4.5,0); rp.castShadow=true; g.add(rp);
+  // canopy
+  const canopy=new THREE.Mesh(new THREE.BoxGeometry(18,1.5,6),white); canopy.position.set(0,9.75,0); canopy.castShadow=true; g.add(canopy);
+  // signboard texture
+  const signTex=ctex(1024,256,(c,w,h)=>{
+    c.fillStyle="#3949ab"; c.fillRect(0,0,w,h);
+    c.fillStyle="#fff"; c.textAlign="center";
+    c.font="bold 70px sans-serif"; c.fillText("আফতাব ফুয়েল স্টেশন",w/2,100);
+    c.font="40px sans-serif"; c.fillText("Dealer : Jamuna Oil Company Limited",w/2,170);
+  });
+  const signMat=new THREE.MeshStandardMaterial({map:signTex});
+  const sign=new THREE.Mesh(new THREE.PlaneGeometry(17,2),signMat); sign.position.set(0,9.75,3.01); g.add(sign);
+  // pumps
+  function createPump(xPos,label){
+    const pump=new THREE.Group();
+    const bottom=new THREE.Mesh(new THREE.BoxGeometry(1.6,1.8,1.2),white); bottom.position.y=.9+.6; bottom.castShadow=true; pump.add(bottom);
+    const stripe=new THREE.Mesh(new THREE.BoxGeometry(1.65,1.2,1.25),red); stripe.position.y=2.4+.6; pump.add(stripe);
+    const labelTex=ctex(256,128,(c,w,h)=>{c.fillStyle="#e0e0e0";c.fillRect(0,0,w,h);c.fillStyle="#111";c.textAlign="center";c.textBaseline="middle";c.font="bold 30px sans-serif";c.fillText(label,w/2,40);c.fillStyle="#222";c.fillRect(80,60,96,40)});
+    const topMat=new THREE.MeshStandardMaterial({map:labelTex});
+    const topMats=[white,white,white,white,topMat,white];
+    const topBlock=new THREE.Mesh(new THREE.BoxGeometry(1.6,1.5,1.2),topMats); topBlock.position.y=3.75+.6; pump.add(topBlock);
+    const pumpRoof=new THREE.Mesh(new THREE.BoxGeometry(1.8,.2,1.4),red); pumpRoof.position.y=4.6+.6; pumpRoof.castShadow=true; pump.add(pumpRoof);
+    const hose=new THREE.Mesh(new THREE.TorusGeometry(.8,.08,8,24,Math.PI),darkHose); hose.position.set(.9,2.5,0); hose.rotation.z=-Math.PI/2; pump.add(hose);
+    const nozzle=new THREE.Mesh(new THREE.BoxGeometry(.2,.4,.2),darkHose); nozzle.position.set(.9,3.2,0); pump.add(nozzle);
+    pump.position.set(xPos,0,.5); return pump;
+  }
+  g.add(createPump(-4,"OCTANE"));
+  g.add(createPump(0,"OCTANE"));
+  g.add(createPump(4,"DIESEL"));
   landmarks.push({x:x,z:z});
   g.rotation.y=-rh(z);
   g.position.set(x,0,z); world.add(g);
