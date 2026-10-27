@@ -687,6 +687,7 @@ function build(){
   const ds=new THREE.Mesh(new THREE.PlaneGeometry(6,1.5),new THREE.MeshBasicMaterial({map:dimlaSign}));
   ds.position.set(cx(-5)+8,3.5,-5); world.add(ds);
   mkDimlaMonument(cx(-5)+12, -5);
+  mkDimlaHospital(cx(-5)+20, -30);
   // Ticket counter
   box(4,2.5,3,M(0xd9cbb0,.6), cx(-8)+10,1.25,-8);
   box(3.6,.1,2.6,M(0x888888,.4), cx(-8)+10,2.55,-8);
@@ -1087,7 +1088,33 @@ function mkDimlaMonument(x,z){
   g.position.set(x,0,z); world.add(g);
 }
 
-/* ---------- Master Bus (With Non-Shuttering Livery) ---------- */
+function mkDimlaHospital(x,z){
+  const g=new THREE.Group();
+  const wall=new THREE.MeshStandardMaterial({color:0xe5e3d8,roughness:.9});
+  const dark=new THREE.MeshStandardMaterial({color:0x222222,roughness:.5});
+  const brown=new THREE.MeshStandardMaterial({color:0x5c4033,roughness:.8});
+  // main building
+  const mb=new THREE.Mesh(new THREE.BoxGeometry(24,12,10),wall); mb.position.set(0,6,-5); mb.castShadow=true; mb.receiveShadow=true; g.add(mb);
+  // canopy
+  const canopy=new THREE.Mesh(new THREE.BoxGeometry(20,2,8),wall); canopy.position.set(0,6.5,4); canopy.castShadow=true; g.add(canopy);
+  // signboard texture
+  const signTex=ctex(2048,256,(c,w,h)=>{c.fillStyle="#e5e3d8";c.fillRect(0,0,w,h);c.fillStyle="#222";c.font="bold 80px sans-serif";c.textAlign="center";c.textBaseline="middle";c.fillText("৫০ শয্যা বিশিষ্ট উপজেলা স্বাস্থ্য কমপ্লেক্স, ডিমলা, নীলফামারী।",w/2,h/2)});
+  const signMat=new THREE.MeshStandardMaterial({map:signTex,roughness:.8});
+  const sign=new THREE.Mesh(new THREE.PlaneGeometry(20,2),signMat); sign.position.set(0,6.5,8.01); g.add(sign);
+  // pillars
+  const pGeo=new THREE.BoxGeometry(1.5,5.5,1.5);
+  [[-8.5,7],[-3,7],[3,7],[8.5,7]].forEach(([px,pz])=>{
+    const p=new THREE.Mesh(pGeo,wall); p.position.set(px,2.75,pz); p.castShadow=true; g.add(p);
+  });
+  // upper windows (brown shutters)
+  const wGeo=new THREE.BoxGeometry(2,3,.2);
+  for(let i=-3;i<=3;i+=2){ if(i===0)continue; const w=new THREE.Mesh(wGeo,brown); w.position.set(i*2.5,10,.1); g.add(w); }
+  // ground floor grill
+  const grill=new THREE.Mesh(new THREE.PlaneGeometry(16,5),dark); grill.position.set(0,3,.01); g.add(grill);
+  g.position.set(x,0,z); world.add(g);
+}
+
+/* ---------- Master Bus */
 function mkBus(){
   envInit();
   if(busG){scene.remove(busG);busG.traverse(o=>{if(o.geometry)o.geometry.dispose()})}
