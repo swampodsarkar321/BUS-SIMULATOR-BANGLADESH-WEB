@@ -76,9 +76,9 @@ label{display:flex;gap:10px;align-items:center;font-size:14px}
 .map-label{position:absolute;font-size:11px;font-weight:800;color:#fff;background:rgba(2,8,14,.85);border:1px solid rgba(255,255,255,.2);padding:2px 7px;border-radius:5px;white-space:nowrap;transform:translate(-50%,14px);pointer-events:none;box-shadow:0 2px 6px rgba(0,0,0,.6)}
 
 /* In-game ETS2 Route Advisor GPS Unit */
-#route-advisor{position:absolute;bottom:14px;right:14px;width:176px;background:rgba(6,16,24,.92);border:2px solid rgba(242,183,5,.5);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.6);overflow:hidden;pointer-events:none;z-index:6;backdrop-filter:blur(6px)}
+#route-advisor{position:absolute;top:60px;right:10px;width:140px;background:rgba(6,16,24,.92);border:2px solid rgba(242,183,5,.5);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.6);overflow:hidden;pointer-events:none;z-index:6;backdrop-filter:blur(6px)}
 .ra-header{background:rgba(10,32,48,.95);padding:4px 8px;display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:800;color:#9eccd8;border-bottom:1px solid rgba(242,183,5,.3)}
-#mini-gps{display:block;background:#06121c;width:100%;height:110px}
+#mini-gps{display:block;background:#06121c;width:100%;height:70px}
 .ra-footer{background:rgba(8,22,34,.95);padding:4px 8px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;color:#fff;border-top:1px solid rgba(255,255,255,.1)}
 #ra-dist-rem{color:var(--ac);font-weight:800}
 
@@ -95,7 +95,7 @@ label{display:flex;gap:10px;align-items:center;font-size:14px}
 #h2{position:absolute;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);pointer-events:none}
 #h2 .pill{position:absolute;background:rgba(8,20,16,.65);border:1px solid rgba(242,183,5,.5);border-radius:16px;padding:5px 14px;font-size:13px;font-weight:600}
 .pb{display:block;height:5px;background:rgba(255,255,255,.2);border-radius:3px;margin-top:3px;overflow:hidden}.pb u{display:block;height:100%;width:0;background:var(--ac);text-decoration:none}
-#spd{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:min(200px,30vw);pointer-events:none}
+#spd{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:min(160px,25vw);pointer-events:none}
 #a6{position:absolute;right:10px;top:8px;display:flex;gap:6px;pointer-events:none}
 .tb2{pointer-events:auto;width:46px;height:46px;padding:0;border-radius:50%;background:linear-gradient(135deg,rgba(10,143,90,.7),rgba(8,20,16,.8));font-size:18px;border:1.5px solid rgba(242,183,5,.5);color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.2);transition:all .12s;backdrop-filter:blur(4px)}
 .tb2:active,.tb2.dn{background:linear-gradient(135deg,#f2b705,#e6a800);color:#000;transform:scale(.92);box-shadow:0 2px 8px rgba(242,183,5,.6)}
@@ -124,7 +124,7 @@ label{display:flex;gap:10px;align-items:center;font-size:14px}
       <b id="a3"></b><br><span id="a4"></span><i class="pb"><u id="a5"></u></i>
     </div>
     <div id="a6"></div>
-    <canvas id="spd" width="220" height="160"></canvas>
+    <canvas id="spd" width="160" height="120"></canvas>
     <div id="tc2"></div>
     <!-- ETS2 GPS Route Advisor Widget -->
     <div id="route-advisor">
@@ -132,7 +132,7 @@ label{display:flex;gap:10px;align-items:center;font-size:14px}
         <span>🧭 ROUTE ADVISOR</span>
         <span id="ra-spd-limit">🚸 ৮০ কিমি</span>
       </div>
-      <canvas id="mini-gps" width="176" height="110"></canvas>
+      <canvas id="mini-gps" width="140" height="70"></canvas>
       <div class="ra-footer">
         <div id="ra-turn-hint">⬆️ সোজা এগিয়ে যান</div>
         <div id="ra-dist-rem">৪.২ কিমি</div>
